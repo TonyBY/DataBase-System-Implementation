@@ -1,3 +1,6 @@
 [submodule "data/tpch-dbgen"]
 	path = data/tpch-dbgen
 	url = https://github.com/electrum/tpch-dbgen.git
+[submodule "src/tpch-dbgen"]
+	path = src/tpch-dbgen
+	url = https://github.com/electrum/tpch-dbgen.git
