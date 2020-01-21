@@ -31,11 +31,7 @@ int main () {
 	myComparison.Print ();
 
 	// now open up the text file and start procesing it
-<<<<<<< HEAD
-        FILE *tableFile = fopen ("../data/10m/lineitem.tbl", "r");
-=======
         FILE *tableFile = fopen ("../data/tpch-dbgen/lineitem.tbl", "r");
->>>>>>> refs/remotes/origin/master
 
         Record temp;
         Schema mySchema ("catalog", "lineitem");
