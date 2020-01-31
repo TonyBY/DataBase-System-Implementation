@@ -12,7 +12,7 @@ tpch1g=# select * from region where r_name='EUROPE';
 
 Time: 0.782 ms
 
-(q2)  select * from region where r_name < 'middle east' and r_regionkey > 1;
+(q2)  select * from region where r_name < 'MIDDLE EAST' and r_regionkey > 1;
 
 tpch1g=# select * from region where r_name < 'middle east' and r_regionkey > 1;
  r_regionkey |          r_name           |                                                    r_comment                                                    
@@ -23,7 +23,7 @@ tpch1g=# select * from region where r_name < 'middle east' and r_regionkey > 1;
 
 Time: 80.351 ms
 
-(q3) select * from nation where n_regionkey = 3 and n_nationkey > 10 and n_name > 'japan';
+(q3) select * from nation where n_regionkey = 3 and n_nationkey > 10 and n_name > 'JAPAN';
 
 tpch1g=# select * from nation where n_regionkey = 3 and n_nationkey > 10 and n_name > 'japan';
  n_nationkey |          n_name           | n_regionkey |                                                  n_comment                                                  

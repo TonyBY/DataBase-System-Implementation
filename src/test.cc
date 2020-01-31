@@ -79,7 +79,7 @@ int main () {
 	setup (catalog_path, dbfile_dir, tpch_dir);
 
 	void (*test) ();
-	relation *rel_ptr[] = {n, r, c, p, ps, o, li};
+	relation *rel_ptr[] = {n, r, c, p, ps, o, li, s};
 	void (*test_ptr[]) () = {&test1, &test2, &test3};  
 
 	int tindx = 0;
@@ -92,7 +92,7 @@ int main () {
 	}
 
 	int findx = 0;
-	while (findx < 1 || findx > 7) {
+	while (findx < 1 || findx > 8) {
 		cout << "\n select table: \n";
 		cout << "\t 1. nation \n";
 		cout << "\t 2. region \n";
@@ -101,6 +101,7 @@ int main () {
 		cout << "\t 5. partsupp \n";
 		cout << "\t 6. orders \n";
 		cout << "\t 7. lineitem \n \t ";
+		cout << "\t 8. supplier\n \t ";
 		cin >> findx;
 	}
 
