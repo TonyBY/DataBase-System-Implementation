@@ -2,7 +2,7 @@
 #include "DBFile.h"
 #include "test.h"
 // make sure that the file path/dir information below is correct
-const char *dbfile_dir = ""; // dir where binary heap files should be stored
+const char *dbfile_dir = "../data/bin/heap/"; // dir where binary heap files should be stored
 const char *tpch_dir ="../data/tpch-dbgen/"; // dir where dbgen tpch files (extension *.tbl) can be found
 const char *catalog_path = "catalog"; // full path of the catalog file
 
