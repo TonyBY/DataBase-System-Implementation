@@ -18,7 +18,7 @@ DBFile::~DBFile() {
 
 }
 
-int DBFile::Create (const char *f_path, fType f_type, void *startup) {
+int DBFile::Create (const char *f_path, fType myType, void *startup) {
     dbFile.Open(0, (char *)f_path);
     return 1;
 }
