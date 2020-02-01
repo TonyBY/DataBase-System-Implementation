@@ -50,20 +50,20 @@ q1
 (r_name = 'EUROPE')
 
 q2 
-(r_name < 'middle east') AND
+(r_name < 'MIDDLE EAST') AND
 (r_regionkey > 1)
 
 q3 
 (n_regionkey = 3) AND
 (n_nationkey > 10) AND
-(n_name > 'japan')
+(n_name > 'JAPAN')
 
 q4 
 (s_suppkey < 10)
 
 q5
 (s_nationkey = 18) AND
-(s_acctbal > 1000) AND
+(s_acctbal > 1000.00) AND
 (s_suppkey < 400)
 
 q6
@@ -75,8 +75,8 @@ q6
 
 q7 
 (p_brand = 'Brand#13') AND
-(p_retailprice > 500) AND
-(p_retailprice < 930) AND
+(p_retailprice > 500.00) AND
+(p_retailprice < 930.00) AND
 (p_size > 28) AND
 (p_size < 1000000)
 
@@ -84,9 +84,9 @@ q8
 (ps_supplycost > 999.98)
 
 q9 
-(ps_availqty < 10)
-(ps_supplycost > 100) AND
-(ps_suppkey < 300) AND
+(ps_availqty < 10) AND
+(ps_supplycost > 100.00) AND
+(ps_suppkey < 300)
 
 q10 
 (o_orderpriority = '1-URGENT') AND
@@ -100,7 +100,7 @@ q11
 (l_shipdate < '1994-01-07') AND
 (l_discount > 0.05) AND
 (l_discount < 0.06) AND
-(l_quantity = 4) 
+(l_quantity = 4.00) 
 
 
 q12

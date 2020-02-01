@@ -20,6 +20,16 @@ public:
 	DBFile();
 	~DBFile();
 
+
+// private:
+//     File dbFile;
+//     Page currPage;
+//     off_t whichPage;
+
+// public:
+// 	DBFile (); 
+//     ~DBFile ();
+
 	/** Meta file format, each item separated by a newline
 	 *  1 filetype (0,1,2)
 	 *  2 OrderMaker (these could be in the same line)

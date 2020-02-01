@@ -44,17 +44,26 @@ int main () {
 	// the CNF expression that was typed in
 	int counter = 0;
 	ComparisonEngine comp;
+    Page page;
         while (temp.SuckNextRecord (&mySchema, tableFile) == 1) {
 		counter++;
-		if (counter % 10000 == 0) {
-			cerr << counter << "\n";
-		}
+			if (counter % 10000 == 0) {
+				cerr << counter << "\n";
+			}
 
-		if (comp.Compare (&temp, &literal, &myComparison))
-                	temp.Print (&mySchema);
+			if (comp.Compare (&temp, &literal, &myComparison)) {
+						temp.Print (&mySchema);
+				//page.Append(&temp);
+			}
 
         }
+    // File file;
+    // file.Open(1, "tests.record");
+    // //file.GetPage(&page, file.GetLength() - 2);
+    // file.GetPage(&page, 0);
+    // while (page.GetFirst(&temp)) {
+    //     temp.Print(&mySchema);
+    // }
+    // file.Close();
 
 }
-
-
