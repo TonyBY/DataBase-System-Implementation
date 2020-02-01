@@ -33,6 +33,7 @@ public:
 	// the deletes the first record from a page and returns it; returns
 	// a zero if there were no records on the page
 	int GetFirst (Record *firstOne);
+	int GetNumRecs() const { return numRecs; }
 
 	// this appends the record to the end of a page.  The return value
 	// is a one on success and a aero if there is no more space
@@ -41,6 +42,8 @@ public:
 
 	// empty it out
 	void EmptyItOut ();
+
+	bool empty() const { return numRecs==0; }
 
 };
 
@@ -59,6 +62,10 @@ public:
 	// returns the current length of the file, in pages
 	off_t GetLength ();
 
+	bool empty() const {return curLength; }
+
+	off_t lastIndex() const { return curLength-2; }
+
 	// opens the given file; the first parameter tells whether or not to
 	// create the file.  If the parameter is zero, a new file is created
 	// the file; if notNew is zero, then the file is created and any other
@@ -76,6 +83,18 @@ public:
 
 	// closes the file and returns the file length (in number of pages)
 	int Close ();
+
+
+	void getLastPage(Page* putItHere) {
+		if(empty()) putItHere = NULL;
+		else return GetPage(putItHere, lastIndex());
+	}
+
+
+	void addPage(Page* addMe) {
+		if(empty()) AddPage(addMe, 0);
+		else AddPage(addMe, lastIndex()+1);
+	}
 
 };
 

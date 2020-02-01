@@ -26,7 +26,7 @@ public:
 		sprintf (rpath, "%s%s.bin", prefix, rname);
 	}
 	const char* name () { return rname; }
-	const char* path () { return rpath; }
+	char* path () { return rpath; }
 	Schema* schema () { return rschema;}
 	void info () {
 		cout << " relation info\n";
@@ -40,7 +40,9 @@ public:
 			std::cout << "Can't parse your CNF.\n";
 			exit (1);
 		}
+		cout << " IN GET_CNF " << schema () <<endl;
 		cnf_pred.GrowFromParseTree (final, schema (), literal); // constructs CNF predicate
+		cnf_pred.Print ();
 	}
 };
 
