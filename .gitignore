@@ -1,14 +1,30 @@
+# IDE related
 .idea/
 .vscode/
+cmake-build-debug/
+build/
+lib/
+tst/
+
+# Data
+*.bin
+
 ##C++ parts
 # Prerequisites
 *.d
+
+#CMakeLists
+CMakeLists.txt
 
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+
+y.tab.c
+lex.yy.c
+y.tab.h
 
 # Precompiled Headers
 *.gch
