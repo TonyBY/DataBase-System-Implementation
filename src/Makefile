@@ -13,12 +13,18 @@ endif
 
 test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o test.o
 	$(CC) -o test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o test.o $(flag)
-	
+
+gTest: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o
+	$(CC) -std=c++17 -I h -pthread -o gTest Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o /usr/local/lib/libgtest.a $(flag)
+
 main: Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o main.o
 	$(CC) -o main Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o main.o $(flag)
 	
 test.o: test.cc
 	$(CC) -g -c test.cc
+
+gTest.o: gTest.cpp
+	g++ -std=c++17 -Wall -I h -I /usr/local/include -c gTest.cpp -o gTest.o
 
 main.o: main.cc
 	$(CC) -g -c main.cc
