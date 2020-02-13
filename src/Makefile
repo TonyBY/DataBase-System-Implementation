@@ -1,13 +1,5 @@
 CC = g++ -O2 -Wno-deprecated
 
-# Flags passed to the preprocessor.
-# We have no idea here whether pthreads is available in the system, so
-# disable its use.
-CPPFLAGS += -I$(FUSED_GTEST_DIR) -DGTEST_HAS_PTHREAD=0
-
-# Flags passed to the C++ compiler.
-CXXFLAGS += -g
-
 ifeq ($(UNAME_S),Linux)
 tag = -n
 else
@@ -15,9 +7,9 @@ tag = -i
 endif
 
 ifeq ($(UNAME_S),Linux)
-flag = -ll
-else
 flag = -lfl
+else
+flag = -ll
 endif
 
 UNAME_S := $(shell uname -s)
