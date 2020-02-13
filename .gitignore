@@ -20,11 +20,15 @@ CMakeLists.txt
 *.slo
 *.lo
 *.o
+*.out
 *.obj
 
 y.tab.c
 lex.yy.c
 y.tab.h
+
+main
+gTest
 
 # Precompiled Headers
 *.gch
