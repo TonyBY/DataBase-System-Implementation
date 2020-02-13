@@ -57,7 +57,7 @@ int DBFile::Close () {
 }
 
 void DBFile::Add (Record &rec) {
-    if (!currPage.Append(&rec)) {
+    if (!currPage.Append(&rec)) { // Append a record into the page. If success, return 1, else 0.
         if (dbFile.GetLength()) {
             dbFile.AddPage(&currPage, dbFile.GetLength() - 1);
         } else {

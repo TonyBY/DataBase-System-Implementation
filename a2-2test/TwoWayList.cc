@@ -2,9 +2,9 @@
 #define _TWO_WAY_LIST_C
 
 #include "TwoWayList.h"
-
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
+
 
 using namespace std;
 
@@ -109,7 +109,7 @@ TwoWayList <Type> :: MoveToStart ()
 
 }
 
-// make the last node the current node
+// make the first node the current node
 template <class Type> void
 TwoWayList <Type> :: MoveToFinish ()
 {

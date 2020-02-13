@@ -109,7 +109,7 @@ TwoWayList <Type> :: MoveToStart ()
 
 }
 
-// make the last node the current node
+// make the first node the current node
 template <class Type> void
 TwoWayList <Type> :: MoveToFinish ()
 {

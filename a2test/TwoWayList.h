@@ -54,8 +54,8 @@ class TwoWayList {
 			// constructor
 			Node () : data (0), next (0), previous (0) {}
 
-			// deconstructor
-			~Node ()
+			// deconstructor 
+			~Node () 
 			{
 				delete data;
 			}

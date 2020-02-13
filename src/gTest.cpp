@@ -24,27 +24,17 @@ TEST(DBFileTest, test1) {
 
     setup (catalog_path, dbfile_dir, tpch_dir);
     relation *rel_ptr[] = {n, r, c, p, ps, o, li, s};
-
     rel = rel_ptr [2];
-
     DBFile dbfile;
 
-//    cout << " DBFile will be created at " << rel->path () << endl;
-//    dbfile.Create (rel->path(), heap, NULL);
     EXPECT_EQ (dbfile.Create (rel->path(), heap, NULL), 1);
 
     char tbl_path[100]; // construct path of the tpch flat text file
     sprintf (tbl_path, "%s%s.tbl", tpch_dir, rel->name());
-//    cout << " tpch file will be loaded from " << tbl_path << endl;
-
     dbfile.Load (*(rel->schema ()), tbl_path);
-//    dbfile.Close ();
+
     EXPECT_EQ (dbfile.Close (),  1);
-
-//    dbfile.Open (rel->path());
     EXPECT_EQ (dbfile.Open (rel->path()),  1);
-
-//    dbfile.Close ();
     EXPECT_EQ (dbfile.Close (),  1);
 }
 
