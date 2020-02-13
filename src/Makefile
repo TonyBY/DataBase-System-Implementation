@@ -1,21 +1,37 @@
-CC = g++ -O2 -Wno-deprecated 
+CC = g++ -O2 -Wno-deprecated
 
-tag = -i
+# Flags passed to the preprocessor.
+# We have no idea here whether pthreads is available in the system, so
+# disable its use.
+CPPFLAGS += -I$(FUSED_GTEST_DIR) -DGTEST_HAS_PTHREAD=0
 
-ifdef linux
+# Flags passed to the C++ compiler.
+CXXFLAGS += -g
+
+ifeq ($(UNAME_S),Linux)
 tag = -n
+else
+tag = -i
 endif
 
+ifeq ($(UNAME_S),Linux)
 flag = -ll
-ifdef linux
+else
 flag = -lfl
 endif
+
+UNAME_S := $(shell uname -s)
 
 test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o test.o
 	$(CC) -o test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o test.o $(flag)
 
+ifeq ($(UNAME_S),Linux)
+gTest: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o
+	$(CC) -std=c++17 -I h -pthread -o gTest Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o /usr/lib/libgtest.a $(flag)
+else
 gTest: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o
 	$(CC) -std=c++17 -I h -pthread -o gTest Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o gTest.o /usr/local/lib/libgtest.a $(flag)
+endif
 
 main: Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o main.o
 	$(CC) -o main Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o main.o $(flag)
@@ -23,8 +39,13 @@ main: Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o 
 test.o: test.cc
 	$(CC) -g -c test.cc
 
+ifeq ($(UNAME_S),Linux)
+gTest.o: gTest.cpp
+	g++ -std=c++17 -Wall -I h -I /usr/include -c gTest.cpp -o gTest.o
+else
 gTest.o: gTest.cpp
 	g++ -std=c++17 -Wall -I h -I /usr/local/include -c gTest.cpp -o gTest.o
+endif
 
 main.o: main.cc
 	$(CC) -g -c main.cc
@@ -46,16 +67,16 @@ Record.o: Record.cc
 
 Schema.o: Schema.cc
 	$(CC) -g -c Schema.cc
-	
-y.tab.o: Parser.y
-	yacc -d Parser.y
-	sed $(tag) -e "s/  __attribute__ ((__unused__))$$/# ifndef __cplusplus\n  __attribute__ ((__unused__));\n# endif/" y.tab.c
-	g++ -c y.tab.c
 
 ifdef linux
 y.tab.o: Parser.y
 	yacc -d Parser.y
 	sed $(tag) y.tab.c -e "s/  __attribute__ ((__unused__))$$/# ifndef __cplusplus\n  __attribute__ ((__unused__));\n# endif/" 
+	g++ -c y.tab.c
+else
+y.tab.o: Parser.y
+	yacc -d Parser.y
+	sed $(tag) -e "s/  __attribute__ ((__unused__))$$/# ifndef __cplusplus\n  __attribute__ ((__unused__));\n# endif/" y.tab.c
 	g++ -c y.tab.c
 endif
 
@@ -69,3 +90,5 @@ clean:
 	rm -f y.tab.c
 	rm -f lex.yy.c
 	rm -f y.tab.h
+	rm -f main
+	rm -f gTest
