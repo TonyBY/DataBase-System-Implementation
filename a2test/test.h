@@ -11,9 +11,9 @@ using namespace std;
 
 // make sure that the information below is correct
 
-char *catalog_path = "catalog"; 
-char *tpch_dir ="/cise/tmp/dbi_sp11/DATA/10M/"; // dir where dbgen tpch files (extension *.tbl) can be found
-char *dbfile_dir = ""; 
+char *catalog_path = "catalog"; // full path of the catalog file
+char *tpch_dir ="../data/tpch-dbgen/"; // dir where dbgen tpch files (extension *.tbl) can be found
+char *dbfile_dir = "../data/bin/heap/"; // dir where binary heap files should be stored
 
 
 extern "C" {
