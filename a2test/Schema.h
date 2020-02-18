@@ -23,7 +23,7 @@ class Schema {
 	Attribute *myAtts;
 
 	// gives the physical location of the binary file storing the relation
-	char *fileName;
+	const char *fileName;
 
 	friend class Record;
 
@@ -38,13 +38,13 @@ public:
 
 	// this finds the position of the specified attribute in the schema
 	// returns a -1 if the attribute is not present in the schema
-	int Find (char *attName);
+	int Find (const char *attName);
 
 	// this finds the type of the given attribute
-	Type FindType (char *attName);
+	Type FindType (const char *attName);
 
 	// this reads the specification for the schema in from a file
-	Schema (char *fName, char *relName);
+	Schema (const char *fName, const char *relName);
 
 	// this constructs a sort order structure that can be used to
 	// place a lexicographic ordering on the records using this type of schema

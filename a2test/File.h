@@ -13,7 +13,7 @@ using namespace std;
 
 class Page {
 private:
-	TwoWayList <Record> *myRecs;
+	TwoWayList <Record> *myRecs; 
 	
 	int numRecs;
 	int curSizeInBytes;
@@ -30,19 +30,38 @@ public:
 	// records from it
 	void FromBinary (char *bits);
 
-	// this deletes the first record from a page and returns it; returns
+	// the deletes the first record from a page and returns it; returns
 	// a zero if there were no records on the page
 	int GetFirst (Record *firstOne);
 
-    int GetNumRecs() const { return numRecs; }
-
 	// this appends the record to the end of a page.  The return value
-	// is a one on success and a zero if there is no more space
+	// is a one on success and a aero if there is no more space
 	// note that the record is consumed so it will have no value after
 	int Append (Record *addMe);
 
 	// empty it out
 	void EmptyItOut ();
+
+	// Get the first record without consuming it from page.
+	int GetFirstNoConsume(Record &firstOne);
+
+	// Get the next record and move forward the cursor in current page
+	int GetNextRecord(Record &nextOne);
+
+	// Get the next record without moving forward the cursor in current page
+	//int GetNextRecordNoMove(Record &nextOne);
+
+	// Get the number of records in this page. That is, numRecs.
+	int GetNumRecs();
+
+	// Check if page is empty
+	bool IsEmpty() {return (numRecs == 0);}
+
+	// Check if 'current' pointer of this page pointing to the first node.
+	bool AtFirst();
+
+	// If 'current' pointer of this page NOT pointing to the first node, move it to first.
+	void MoveToFirst();
 
 };
 

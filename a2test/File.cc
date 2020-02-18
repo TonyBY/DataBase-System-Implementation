@@ -106,7 +106,10 @@ void Page :: ToBinary (char *bits) {
 }
 
 
-void Page :: FromBinary (char *bits) {
+void Page :: FromBinary (char *bits) { 
+	// Notice: This function will cause 'current' pointer of myRecs to move to its last node.
+	// So after File::GetPage, the 'current' pointer in the page we got must be at the last node.
+	// So we need to move it to first mannually after GetPage. 
 
 	// first read the number of records on the page
 	numRecs = ((int *) bits)[0];
@@ -152,8 +155,78 @@ void Page :: FromBinary (char *bits) {
 		myRecs->Advance ();
 		curPos += len;
 	}
-
+	 
 	delete temp;
+}
+
+int Page::GetFirstNoConsume(Record &firstOne){
+	
+	myRecs->MoveToStart();
+
+	// make sure there is data 
+	if (!myRecs->RightLength ()) {
+		return 0;
+	}
+
+	// Record contains a pointer *bits --> So we have to deep copy that when fetching a record.
+	// If we only use returnRecord = goalRecord, we will only copy value of the pointer, 
+	// that is, an address, instead of the data in that address. 
+	// This causes two pointers to point at the same address, which means if we free one of them, 
+	// another pointer will become a dangling pointer.
+	// Most of time, the error "double free or corruption" is caused by this case.  
+	firstOne.Copy(myRecs->Current(0));
+	
+	return 1;
+}
+
+int Page::GetNextRecord(Record &nextOne){
+	try{
+		if (myRecs->RightLength() > 0){ // The next record in this page exists.
+			nextOne.Copy(myRecs->Current(0));
+			myRecs->Advance();
+			return 1;
+		}
+		else{ // Has arrived at the last record in this page.
+			return 2;
+		}
+	}
+	catch(exception e){
+		cerr << "[Error] In function Page::GetNextRecord(Record *nextOne): " << e.what() << endl;
+		return 0;
+	}
+}
+
+/*
+int Page::GetNextRecordNoMove(Record &nextOne) {
+	try{
+		if (myRecs->RightLength() > 0){ // The next record in this page exists.
+			nextOne.Copy(myRecs->Current(0));
+			//myRecs->Advance();
+			return 1;
+		}
+		else{ // Has arrived at the last record in this page.
+			return 2;
+		}
+	}
+	catch(exception e){
+		cerr << "[Error] In function Page::GetNextRecordNoMove(Record *nextOne): " << e.what() << endl;
+		return 0;
+	}
+}
+*/
+
+int Page::GetNumRecs() {
+	return numRecs;
+}
+
+bool Page::AtFirst(){
+	return (myRecs->LeftLength() == 0);
+}
+
+void Page::MoveToFirst(){
+	if (!AtFirst()){
+		myRecs->MoveToStart();
+	}
 }
 
 File :: File () {
@@ -166,6 +239,7 @@ File :: ~File () {
 void File :: GetPage (Page *putItHere, off_t whichPage) {
 
 	// this is because the first page has no data
+	// the first page only contains meta-data like the number of pages in this file.
 	whichPage++;
 
 	if (whichPage >= curLength) {
@@ -184,6 +258,10 @@ void File :: GetPage (Page *putItHere, off_t whichPage) {
 
 	lseek (myFilDes, PAGE_SIZE * whichPage, SEEK_SET);
 	read (myFilDes, bits, PAGE_SIZE);
+	
+	// Notice: FromBinary(bits) will cause 'current' pointer of myRecs in putItHere to move to its last node.
+	// So after File::GetPage, the 'current' pointer in the page we got must be at the last node.
+	// So we need to move it to first mannually after GetPage. 
 	putItHere->FromBinary (bits);
 	delete [] bits;
 	
@@ -193,6 +271,7 @@ void File :: GetPage (Page *putItHere, off_t whichPage) {
 void File :: AddPage (Page *addMe, off_t whichPage) {
 
 	// this is because the first page has no data
+	// the first page only contains meta-data like the number of pages in this file.
 	whichPage++;
 
 	// if we are trying to add past the end of the file, then
@@ -232,6 +311,10 @@ void File :: Open (int fileLen, char *fName) {
 
 	// figure out the flags for the system open call
         int mode;
+
+		// O_TRUNC will cause file to be cleaned up. So DO NOT try to open any existed file
+		// using parameter fileLen = 0, or its content will be erased.
+
         if (fileLen == 0)
                 mode = O_TRUNC | O_RDWR | O_CREAT;
         else
@@ -253,10 +336,10 @@ void File :: Open (int fileLen, char *fName) {
 	// read in the buffer if needed
 	if (fileLen != 0) {
 
-		// read in the first few bits, which is the page size
+		// read in the first sizeof(off_t) bits, which is the number of pages in this file. 
 		lseek (myFilDes, 0, SEEK_SET);
 		read (myFilDes, &curLength, sizeof (off_t));
-
+		
 	} else {
 		curLength = 0;
 	}

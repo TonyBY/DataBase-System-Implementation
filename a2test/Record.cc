@@ -18,6 +18,20 @@ Record :: ~Record () {
 
 }
 
+/*
+ * Returns length of bits in byte
+ * Though it is called "bits", it is actually bytes 
+ * Each element in bits is a char of the record which is 1-byte long
+ * So length of bits is represented in byte initially
+ * 	
+ * -- Added by Yifan Wang
+ */ 
+int Record :: length() {
+	if (bits == NULL) {
+		return 0;
+	}
+	return ((int *) bits)[0];
+}
 
 int Record :: SuckNextRecord (Schema *mySchema, FILE *textFile) {
 

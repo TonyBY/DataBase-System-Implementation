@@ -10,20 +10,14 @@
 
 typedef enum {heap, sorted, tree} fType;
 
-// stub DBFile header..replace it with your own DBFile.h 
-
 class DBFile {
 
-private:
-    File dbFile;
-    Page currPage;
-    off_t whichPage;
-
 public:
+	File file;
+	
 	DBFile (); 
-    ~DBFile ();
 
-	int Create (const char *fpath, fType myType, void *startup);
+	int Create (const char *fpath, fType file_type, void *startup);
 	int Open (const char *fpath);
 	int Close ();
 
@@ -33,6 +27,14 @@ public:
 	void Add (Record &addme);
 	int GetNext (Record &fetchme);
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
-
+	
+private: 
+	//Record currentRecord;
+	// Since the first page has no data, we only need to record the index of current page with data
+	// So when currentDataPageIdx == 0, it means we are at the first DATA page, which is actually the second page in file.
+	// currentDataPageIdx is 0-based.
+	Page currentPage;
+	off_t currentDataPageIdx;
+	fType myType;
 };
 #endif
