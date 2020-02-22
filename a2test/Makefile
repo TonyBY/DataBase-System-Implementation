@@ -16,8 +16,8 @@ a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o Pi
 test.o: test.cc
 	$(CC) -g -c test.cc
 
-gTest: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o BigQ.o gTest.o
-	$(CC) -std=c++17 -I h -pthread -o gTest Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o y.tab.o lex.yy.o BigQ.o gTest.o /usr/lib/libgtest.a -lfl
+gTest: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o gTest.o
+	$(CC) -std=c++17 -I h -pthread -o gTest Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o gTest.o /usr/lib/libgtest.a -lfl
 
 a1-test.o: a1-test.cc
 	$(CC) -g -c a1-test.cc
