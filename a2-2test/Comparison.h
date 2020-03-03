@@ -1,11 +1,15 @@
 #ifndef COMPARISON_H
 #define COMPARISON_H
 
+#include <algorithm> 
+#include <string>
+#include <vector>
 #include "Record.h"
 #include "Schema.h"
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
+#include "Util.h"
 
 
 // This stores an individual comparison that is part of a CNF
@@ -13,6 +17,7 @@ class Comparison {
 
 	friend class ComparisonEngine;
 	friend class CNF;
+	friend class OrderMaker;
 
 	Target operand1;
 	int whichAtt1;
@@ -32,10 +37,12 @@ public:
 
 	// print to the screen
 	void Print ();
+
 };
 
 
 class Schema;
+class CNF;
 
 // This structure encapsulates a sort order for records
 class OrderMaker {
@@ -58,8 +65,18 @@ public:
 	// based upon ALL of their attributes
 	OrderMaker(Schema *schema);
 
+	// create an OrderMaker from its string version
+	OrderMaker(std::string& numAttsStr, std::string& whichAttsStr, std::string& whichTypesStr);
+
+	// Create query OrderMaker used in binary search
+	static int QueryOrderMaker(OrderMaker& queryOrder, OrderMaker& sortOrder, CNF& cnf);
+
 	// print to the screen
 	void Print ();
+
+	// Convert to string
+	std::string toString ();
+
 };
 
 class Record;
@@ -70,6 +87,7 @@ class Record;
 class CNF {
 
 	friend class ComparisonEngine;
+	friend class OrderMaker;
 
 	Comparison orList[MAX_ANDS][MAX_ORS];
 	
@@ -77,6 +95,8 @@ class CNF {
 	int numAnds;
 
 public:
+
+	int findAtt(int att);
 
 	// this returns an instance of the OrderMaker class that
 	// allows the CNF to be implemented using a sort-based

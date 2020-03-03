@@ -14,11 +14,12 @@ int add_data (FILE *src, int numrecs, int &res) {
 	int xx = 20000;
 	while ((res = temp.SuckNextRecord (rel->schema (), src)) && ++proc < numrecs) {
 		dbfile.Add (temp);
+		//cout << "Add 1" << endl;
 		if (proc == xx) cerr << "\t ";
 		if (proc % xx == 0) cerr << ".";
 	}
-
-	dbfile.Close ();
+	
+	cout  << "final close: " << dbfile.Close () << endl;
 	return proc;
 }
 
@@ -46,8 +47,8 @@ void test1 () {
 	sprintf (tbl_path, "%s%s.tbl", tpch_dir, rel->name()); 
 	cout << " input from file : " << tbl_path << endl;
 
-        FILE *tblfile = fopen (tbl_path, "r");
-
+    FILE *tblfile = fopen (tbl_path, "r");
+	//cout << "here" << endl;
 	srand48 (time (NULL));
 
 	int proc = 1, res = 1, tot = 0;
@@ -61,7 +62,7 @@ void test1 () {
 			cin >> x;
 		}
 		if (x < 3) {
-			proc = add_data (tblfile,lrand48()%(int)pow(1e3,x)+(x-1)*1000, res);
+			proc = add_data (tblfile, lrand48()%(int)pow(1e3,x)+(x-1)*1000, res);
 			tot += proc;
 			if (proc) 
 				cout << "\n\t added " << proc << " recs..so far " << tot << endl;
@@ -80,8 +81,10 @@ void test2 () {
 	cout << " scan : " << rel->path() << "\n";
 	DBFile dbfile;
 	dbfile.Open (rel->path());
-	dbfile.MoveFirst ();
+	//cout << "Len: " << dbfile.m_file->file->GetLength() << endl;
 
+	dbfile.MoveFirst ();
+	
 	Record temp;
 
 	int cnt = 0;

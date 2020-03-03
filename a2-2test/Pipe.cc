@@ -1,6 +1,10 @@
 #include "Pipe.h"
-#include <stdlib.h>
-#include <iostream> 
+
+#include <iostream>
+#include <stdlib.h> 
+
+// Default constructor, do nothing
+Pipe :: Pipe() {}
 
 Pipe :: Pipe (int bufferSize) {
 
@@ -27,12 +31,14 @@ Pipe :: Pipe (int bufferSize) {
 }
 
 Pipe :: ~Pipe () {
+
 	// free everything up!
 	delete [] buffered;
 
 	pthread_mutex_destroy (&pipeMutex);
 	pthread_cond_destroy (&producerVar);
 	pthread_cond_destroy (&consumerVar);
+	
 }
 
 
@@ -128,4 +134,44 @@ void Pipe :: ShutDown () {
 	// unlock the mutex
 	pthread_mutex_unlock (&pipeMutex);
 	
+}
+
+/*
+void Pipe :: Open () {
+
+	// first, get a mutex on the pipeline
+        pthread_mutex_lock (&pipeMutex);
+
+	// note that we are now open the pipeline
+	done = 0;
+
+	// signal the consumer who may be waiting
+	pthread_cond_signal (&consumerVar);
+
+	// unlock the mutex
+	pthread_mutex_unlock (&pipeMutex);
+	
+}
+*/
+
+bool Pipe :: isClosed() {
+	
+	pthread_mutex_lock (&pipeMutex);
+	
+	bool res = (done == 1);
+	
+	pthread_mutex_unlock (&pipeMutex);
+	
+	return res;
+}
+
+bool Pipe :: isEmpty() {
+	
+	pthread_mutex_lock (&pipeMutex);
+	
+	bool res = (lastSlot == firstSlot);
+	
+	pthread_mutex_unlock (&pipeMutex);
+	
+	return res;
 }

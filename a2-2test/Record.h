@@ -37,6 +37,12 @@ public:
 	Record ();
 	~Record();
 
+	// deep copy constructor, added by Yifan Wang
+	//Record(const Record& src);
+
+	// Added by Yifan wang
+	int length();
+
 	// suck the contents of the record fromMe into this; note that after
 	// this call, fromMe will no longer have anything inside of it
 	void Consume (Record *fromMe);
@@ -65,6 +71,17 @@ public:
 	// prints the contents of the record; this requires
 	// that the schema also be given so that the record can be interpreted
 	void Print (Schema *mySchema);
+
+	// only makes *bits NULL, without deleting it
+	// This is for implicitly copying a record
+	// For example, we declare 'vector<Record> vec' globally, 
+	// then in a block: { Record rec; page.GetFirstRecord(rec); vec.push_back(rec);}
+	// vec.push_back will implicitly shallow copy rec and push the copy into vec
+	// so after push_back(), vec.back().bits == rec.bits as it is just shallow copy
+	// Then at the end of the block, rec will call its destructor which will delete its bits pointer
+	// This means vec.back().bits will be also deleted. Then there is an error.
+	// So we have to use this PointNULL() to make the old record's bits as NULL such that its destructor will not affect vec's element.
+	void PointNULL () {bits = NULL;}
 };
 
 #endif

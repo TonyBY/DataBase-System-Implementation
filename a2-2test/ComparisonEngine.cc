@@ -10,15 +10,18 @@
 // returns a -1, 0, or 1 depending upon whether left is less then, equal to, or greater
 // than right, depending upon the OrderMaker
 int ComparisonEngine :: Compare(Record *left, Record *right, OrderMaker *orderUs) {
-
+	// cout << "Enter ComparisonEngin :: Compare " << endl;
 	char *val1, *val2;
 
 	char *left_bits = left->GetBits();
 	char *right_bits = right->GetBits();
 
 	for (int i = 0; i < orderUs->numAtts; i++) {
+		// cout << "Enter for loop " << endl;
 		val1 = left_bits + ((int *) left_bits)[orderUs->whichAtts[i] + 1];
+		// cout << "Got val1 " << endl;
 		val2 = right_bits + ((int *) right_bits)[orderUs->whichAtts[i] + 1];
+		// cout << "Got val2 " << endl;
 	
 		// these are used to store the two operands, depending on their type
 		int val1Int, val2Int;
@@ -29,7 +32,7 @@ int ComparisonEngine :: Compare(Record *left, Record *right, OrderMaker *orderUs
 	
 			// first case: we are dealing with integers
 			case Int:
-	
+			// cout << "case Int " << endl;
 			// cast the two bit strings to ints
 			val1Int = *((int *) val1);
 			val2Int = *((int *) val2);
@@ -45,7 +48,7 @@ int ComparisonEngine :: Compare(Record *left, Record *right, OrderMaker *orderUs
 	
 			// second case: dealing with doubles
 			case Double:
-	
+			// cout << "case Double " << endl;
 			// cast the two bit strings to doubles
 			val1Double = *((double *) val1);
 			val2Double = *((double *) val2);
@@ -61,7 +64,13 @@ int ComparisonEngine :: Compare(Record *left, Record *right, OrderMaker *orderUs
 	
 			// last case: dealing with strings
 			default:
+			// cout << "case String " << endl;
+			// cout << "val1= " << val1 << endl;
+			// cout << "val2= " << val2 << endl;
+			// cout << "case String " << endl;
 			int sc = strcmp (val1, val2);
+			// cout << "Got sc " << endl;
+			// cout << "sc = " << sc << endl;
 			if (sc != 0)
 				return sc;
 
@@ -416,5 +425,3 @@ int ComparisonEngine :: Run (Record *left, Record *right, Record *literal, Compa
 	}
 
 }
-
-

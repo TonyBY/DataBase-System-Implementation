@@ -1,9 +1,10 @@
 #include "Schema.h"
 #include <string.h>
 #include <stdio.h>
-#include <iostream>
 #include <stdlib.h>
-int Schema :: Find (char *attName) {
+#include <iostream>
+
+int Schema :: Find (const char *attName) {
 
 	for (int i = 0; i < numAtts; i++) {
 		if (!strcmp (attName, myAtts[i].name)) {
@@ -15,7 +16,7 @@ int Schema :: Find (char *attName) {
 	return -1;
 }
 
-Type Schema :: FindType (char *attName) {
+Type Schema :: FindType (const char *attName) {
 
 	for (int i = 0; i < numAtts; i++) {
 		if (!strcmp (attName, myAtts[i].name)) {
@@ -35,7 +36,7 @@ Attribute *Schema :: GetAtts () {
 	return myAtts;
 }
 
-Schema :: Schema (char *fName, char *relName) {
+Schema :: Schema (const char *fName, const char *relName) {
 
 	FILE *foo = fopen (fName, "r");
 	
