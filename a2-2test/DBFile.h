@@ -84,17 +84,20 @@ class Sorted : public virtual GenericDBFile {
 		OrderMaker queryOrder;
 		bool continuousGetNext;
 
+		// Initializes the input pipe instance, the output pipe instance, and the BigQ instance.
 		void createSorter() {
     		m_sorter.inPipe = new Pipe(BigQBuffSize);
 			m_sorter.outPipe = new Pipe(BigQBuffSize);
     		m_sorter.sorter = new BigQ(*(m_sorter.inPipe), *(m_sorter.outPipe), m_order, m_runLength);
   		}
 
+		// Release the memory by deleting the instances of the input pipe, the output pipe, and the BigQ.
   		void deleteSorter() {
     		delete m_sorter.inPipe; delete m_sorter.outPipe; delete m_sorter.sorter;
     		m_sorter.sorter = NULL; m_sorter.inPipe = m_sorter.outPipe = NULL;
 		}
 		
+		// First shuts down the input pipe and clean up the cache file, then calls the twoWayMerge() to read and merge the records from the output pipe and the sorted file into the cache file in ascending order.
 		void startReading() {
 			if (m_mode == writing) {
 				m_mode = reading;
@@ -108,6 +111,7 @@ class Sorted : public virtual GenericDBFile {
 			}
 		}
 
+		// Sets the mode as writing and calls the createSorter().
 		void startWriting() {
 			if (m_mode == reading) {
 				m_mode = writing;
@@ -115,6 +119,7 @@ class Sorted : public virtual GenericDBFile {
 			}
 		}
 		
+		// Verwrites the content of the sorted file with the content in the cache file.
 		void moveCacheToFile() {
 
 			if (m_cache->file->GetLength() <= 1) {
