@@ -74,6 +74,7 @@ void twoWayMerge(Pipe* pipe, DBFBase* sorted_file, DBFBase* out, OrderMaker* ord
 
 }
 
+// Erase the content in the file
 void emptyFile(string fpath) {
     DBFBase db;
 	db.file->Open(0, (char*)(fpath.c_str()));
