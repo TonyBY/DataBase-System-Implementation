@@ -1,0 +1,6 @@
+BEGIN
+answers
+answers.tbl
+sum Double
+s_suppkey Int
+END

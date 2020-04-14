@@ -1,0 +1,282 @@
+TC1
+Optimal predicate (cost 0): ( n_name = UNITED STATES )
+Project(-1, 1, -1, 2)  
+SelectPipe(-1, 0, -1, 1)  
+SelectFile(0, -1, -1, 0)  
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 0, Output pipe ID 1
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+( Att 1 from left record = Att 0 from literal record (String)) 
+
+Operation: Project
+Input pipe ID 1, Output pipe ID 2
+Output schema:
+n_nationkey: Int 
+Attributes to keep:
+n_nationkey: Int; 
+
+***************************************************************************************************************************
+TC2
+Optimal predicate (cost 8.33333): ( n_nationkey > 5 ) AND ( n_regionkey = r_regionkey )
+Project(-1, 3, -1, 4)  
+Join(-1, 2, 1, 3)  
+SelectPipe(-1, 0, -1, 2)  SelectFile(1, -1, -1, 1)  
+SelectFile(0, -1, -1, 0)  
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 0, Output pipe ID 2
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+( Att 0 from left record > Att 0 from literal record (Int)) 
+
+Operation: Join
+Input pipe ID 2, Input pipe ID 1, Output pipe ID 3
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String 
+CNF:
+( Att 2 from left record = Att 0 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 1, Output pipe ID 1
+Output schema:
+r_regionkey: Int r_name: String r_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Project
+Input pipe ID 3, Output pipe ID 4
+Output schema:
+n_name: String 
+Attributes to keep:
+n_name: String; 
+
+***************************************************************************************************************************
+TC3
+Optimal predicate (cost 1): ( n_name = UNITED STATES ) AND ( n_regionkey = r_regionkey )
+Sum(-1, 3, -1, 4)  
+Join(-1, 2, 1, 3)  
+SelectPipe(-1, 0, -1, 2)  SelectFile(1, -1, -1, 1)  
+SelectFile(0, -1, -1, 0)  
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 0, Output pipe ID 2
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+( Att 1 from left record = Att 0 from literal record (String)) 
+
+Operation: Join
+Input pipe ID 2, Input pipe ID 1, Output pipe ID 3
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String 
+CNF:
+( Att 2 from left record = Att 0 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 1, Output pipe ID 1
+Output schema:
+r_regionkey: Int r_name: String r_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Sum
+Input pipe ID 3, Output pipe ID 4
+Output schema:
+sum: Int 
+Aggregation Function (represented in Reverse Polish notation):
+n_nationkey 
+
+***************************************************************************************************************************
+TC4
+Optimal predicate (cost 1): ( n_name = UNITED STATES ) AND ( n_regionkey = r_regionkey )
+Group By(-1, 3, -1, 4)  
+Join(-1, 2, 1, 3)  
+SelectPipe(-1, 0, -1, 2)  SelectFile(1, -1, -1, 1)  
+SelectFile(0, -1, -1, 0)  
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 0, Output pipe ID 2
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+( Att 1 from left record = Att 0 from literal record (String)) 
+
+Operation: Join
+Input pipe ID 2, Input pipe ID 1, Output pipe ID 3
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String 
+CNF:
+( Att 2 from left record = Att 0 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 1, Output pipe ID 1
+Output schema:
+r_regionkey: Int r_name: String r_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Group By
+Input pipe ID 3, Output pipe ID 4
+Output schema:
+sum: Int n_regionkey: Int 
+OrderMaker: 
+NumAtts =     1
+  0:     0 Int
+Aggregate function (represented in Reverse Polish notation): 
+n_regionkey 
+
+***************************************************************************************************************************
+TC5
+Optimal predicate (cost 16.3333): ( n_nationkey > 10 ) AND ( n_regionkey = r_regionkey ) AND ( n_nationkey = c_nationkey )
+Group By(-1, 6, -1, 7)  
+Duplicate Removal(-1, 5, -1, 6)  
+Join(-1, 4, 0, 5)  
+Join(-1, 3, 2, 4)  SelectFile(0, -1, -1, 0)  
+SelectPipe(-1, 1, -1, 3)  SelectFile(2, -1, -1, 2)  
+SelectFile(1, -1, -1, 1)  
+Operation: SelectFile
+Input file ID 1, Output pipe ID 1
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 1, Output pipe ID 3
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String 
+CNF:
+( Att 0 from left record > Att 0 from literal record (Int)) 
+
+Operation: Join
+Input pipe ID 3, Input pipe ID 2, Output pipe ID 4
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String 
+CNF:
+( Att 2 from left record = Att 0 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 2, Output pipe ID 2
+Output schema:
+r_regionkey: Int r_name: String r_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Join
+Input pipe ID 4, Input pipe ID 0, Output pipe ID 5
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String c_custkey: Int c_name: String c_address: String c_nationkey: Int c_phone: String c_acctbal: Double c_mktsegment: String c_comment: String 
+CNF:
+( Att 0 from left record = Att 3 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+c_custkey: Int c_name: String c_address: String c_nationkey: Int c_phone: String c_acctbal: Double c_mktsegment: String c_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Duplicate Removal
+Input pipe ID 5, Output pipe ID 6
+Output schema:
+n_nationkey: Int n_name: String n_regionkey: Int n_comment: String r_regionkey: Int r_name: String r_comment: String c_custkey: Int c_name: String c_address: String c_nationkey: Int c_phone: String c_acctbal: Double c_mktsegment: String c_comment: String 
+
+Operation: Group By
+Input pipe ID 6, Output pipe ID 7
+Output schema:
+sum: Int r_regionkey: Int 
+OrderMaker: 
+NumAtts =     1
+  0:     0 Int
+Aggregate function (represented in Reverse Polish notation): 
+n_nationkey r_regionkey + 
+
+***************************************************************************************************************************
+TC6
+Optimal predicate (cost 269973): ( s_acctbal > 0 ) AND ( s_suppkey = ps_suppkey ) AND ( p_partkey = ps_partkey )
+Group By(-1, 5, -1, 6)  
+Join(-1, 0, 4, 5)  
+SelectFile(0, -1, -1, 0)  Join(-1, 3, 1, 4)  
+SelectPipe(-1, 2, -1, 3)  SelectFile(1, -1, -1, 1)  
+SelectFile(2, -1, -1, 2)  
+Operation: SelectFile
+Input file ID 0, Output pipe ID 0
+Output schema:
+p_partkey: Int p_name: String p_mfgr: String p_brand: String p_type: String p_size: Int p_container: String p_retailprice: Double p_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Join
+Input pipe ID 0, Input pipe ID 4, Output pipe ID 5
+Output schema:
+p_partkey: Int p_name: String p_mfgr: String p_brand: String p_type: String p_size: Int p_container: String p_retailprice: Double p_comment: String s_suppkey: Int s_name: String s_address: String s_nationkey: Int s_phone: String s_acctbal: Double s_comment: String ps_partkey: Int ps_suppkey: Int ps_availqty: Int ps_supplycost: Double ps_comment: String 
+CNF:
+( Att 0 from left record = Att 7 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 2, Output pipe ID 2
+Output schema:
+s_suppkey: Int s_name: String s_address: String s_nationkey: Int s_phone: String s_acctbal: Double s_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: SelectPipe
+Input pipe ID 2, Output pipe ID 3
+Output schema:
+s_suppkey: Int s_name: String s_address: String s_nationkey: Int s_phone: String s_acctbal: Double s_comment: String 
+CNF:
+( Att 5 from left record > Att 0 from literal record (Double)) 
+
+Operation: Join
+Input pipe ID 3, Input pipe ID 1, Output pipe ID 4
+Output schema:
+s_suppkey: Int s_name: String s_address: String s_nationkey: Int s_phone: String s_acctbal: Double s_comment: String ps_partkey: Int ps_suppkey: Int ps_availqty: Int ps_supplycost: Double ps_comment: String 
+CNF:
+( Att 0 from left record = Att 1 from right record (Int)) 
+
+Operation: SelectFile
+Input file ID 1, Output pipe ID 1
+Output schema:
+ps_partkey: Int ps_suppkey: Int ps_availqty: Int ps_supplycost: Double ps_comment: String 
+CNF:
+No CNF because this node is only for loading all data
+
+Operation: Group By
+Input pipe ID 5, Output pipe ID 6
+Output schema:
+sum: Double s_suppkey: Int 
+OrderMaker: 
+NumAtts =     1
+  0:     0 Int
+Aggregate function (represented in Reverse Polish notation): 
+ps_supplycost 
+
+***************************************************************************************************************************
