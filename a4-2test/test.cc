@@ -14,5 +14,7 @@ int main() {
 	// printQueryPlanTree((QueryPlanNode*)q.getRoot());
 	std::cout << "PRINTING TREE IN ORDER:" << std::endl;
 	std::cout << std::endl;
-	printInOrderQueryPlan((QueryPlanNode*)q.getRoot());
+	// printInOrderQueryPlan((QueryPlanNode*)q.getRoot());
+	printLevelOrder((QueryPlanNode*)q.getRoot());
+	// printInOrderQueryPlan_BFS((QueryPlanNode*)q.getRoot());
 }

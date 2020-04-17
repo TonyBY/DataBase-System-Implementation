@@ -1,7 +1,7 @@
 #include "QueryOptimizer.h"
 
-const char *dbfile_dir = "../../data/bin/"; // dir where binary heap files should be stored
-const char *tpch_dir ="../../data/tpch-dbgen/"; // dir where dbgen tpch files (extension *.tbl) can be found
+const char *dbfile_dir = "../data/bin/"; // dir where binary heap files should be stored
+const char *tpch_dir ="../data/tpch-dbgen/"; // dir where dbgen tpch files (extension *.tbl) can be found
 const char *catalog_path = "catalog"; // full path of the catalog file
 const char *dbfile_ext_name = ".bin"; // extension name of binary db data file
 const char *tpch_ext_name = ".tbl"; 
@@ -44,6 +44,7 @@ void printQueryPlanTree(QueryPlanNode *root) {
     std::cout << std::endl;
 }
 
+// Print the QueryPlan in a deep first search manner.
 void printInOrderQueryPlan(QueryPlanNode *root) {
     if (root == NULL) {
         return;
@@ -52,6 +53,80 @@ void printInOrderQueryPlan(QueryPlanNode *root) {
     root->print();
     printInOrderQueryPlan(root->right);
 }
+
+// Print the QueryPlan in a breath first search manner.
+/* Function to print level  
+order traversal a tree*/
+/* Print nodes at a given level */
+void printGivenLevel(QueryPlanNode* root, int level)  
+{  
+    if (root == NULL)  
+        return;  
+    if (level == 1)  
+        root->print();  
+    else if (level > 1)  
+    {  
+        printGivenLevel(root->left, level-1);  
+        printGivenLevel(root->right, level-1);  
+    }  
+}
+
+void printLevelOrder(QueryPlanNode* root)  
+{  
+    int h = height(root);  
+    int i;  
+    for (i = h; i >= 0; i--)  
+        printGivenLevel(root, i);  
+}  
+
+/* Compute the "height" of a tree -- the number of  
+    nodes along the longest path from the root node  
+    down to the farthest leaf node.*/
+int height(QueryPlanNode* node)  
+{  
+    if (node == NULL)  
+        return 0;  
+    else
+    {  
+        /* compute the height of each subtree */
+        int lheight = height(node->left);  
+        int rheight = height(node->right);  
+  
+        /* use the larger one */
+        if (lheight > rheight)  
+            return(lheight + 1);  
+        else return(rheight + 1);  
+    }  
+}  
+
+
+void printInOrderQueryPlan_BFS(QueryPlanNode *root) 
+{ 
+    // Base Case 
+    if (root == NULL)  return; 
+  
+    // Create an empty queue for level order tarversal 
+    queue<QueryPlanNode *> q; 
+  
+    // Enqueue Root and initialize height 
+    q.push(root); 
+  
+    while (q.empty() == false) 
+    { 
+        // Print front of queue and remove it from queue 
+        QueryPlanNode *node = q.front(); 
+        node->print();
+        q.pop(); 
+  
+        /* Enqueue left child */
+        if (node->left != NULL) 
+            q.push(node->left); 
+  
+        /*Enqueue right child */
+        if (node->right != NULL) 
+            q.push(node->right); 
+    } 
+} 
 
 void deleteQueryPlanTree(QueryPlanNode *root) {
     if (root == NULL) {
@@ -236,7 +311,7 @@ void QueryPlan::createPlanTree() {
     createSumNodes();
     createGroupByNodes();
     // createWriteOutNodes(std::string(tpch_dir) + answers_relname + std::string(tpch_ext_name));
-    root->saveSchema(answers_catalog, answers_relname);
+    // root->saveSchema(answers_catalog, answers_relname);
 }
 
 // create nodes for loading data 
@@ -255,6 +330,8 @@ void QueryPlan::createLoadDataNodes() {
         }
     }
     for (std::map<std::string, int>::iterator it = all_need_rels.begin(); it != all_need_rels.end(); it++) {
+        std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
+        std::cout << it->first << std::endl;
         SelectNode *leaf = new SelectNode(SELECT_FILE, NULL, NULL, false, (char*)catalog_path, (char*)(it->first.c_str()));
         leaves.push_back(leaf);
         relname_node[it->first] = leaf; // it->first if the relation name string
@@ -295,6 +372,8 @@ void QueryPlan::updateRelnameNodeMap(QueryPlanNode *new_root, QueryPlanNode *lef
 QueryPlanNode* QueryPlan::createPredicateNodes() {
     QueryPlanNode *new_root = NULL;
     for (int i = 0; i < min_order.size(); i++) {
+        std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+        std::cout << Util::ParseTreeToString(min_order[i]) << std::endl;
         std::vector<std::string> relnames = getRelNames(min_order[i]);
         if (relnames.size() == 1) {
             // select pipe node
@@ -313,6 +392,19 @@ QueryPlanNode* QueryPlan::createPredicateNodes() {
             std::string cur_rel_right = relnames[1];
             QueryPlanNode *left = relname_node[cur_rel_left];
             QueryPlanNode *right = relname_node[cur_rel_right];
+            std::cout << "-----------------------------------------" << std::endl;
+            if (node_relnames[left].size() == 1) {
+                std::cout << node_relnames[left][0] << std::endl;
+            }
+            else{
+                std::cout << node_relnames[left][0] << ", " << node_relnames[left][1] << std::endl;
+            }
+            if (node_relnames[right].size() == 1) {
+                std::cout << node_relnames[right][0] << std::endl;
+            }
+            else{
+                std::cout << node_relnames[right][0] << ", " << node_relnames[right][1] << std::endl;
+            }
             JoinNode *join_node = new JoinNode(min_order[i], left, right);
             //relname_node[cur_rel_left] = join_node;
             //relname_node[cur_rel_right] = join_node;
@@ -676,6 +768,9 @@ void QueryPlanNode::print() {
     if (type == WRITE_OUT && file_id >= 0) {
         std::cout << "Output file ID " << file_id << std::endl;
     }
+    else if (type == JOIN){
+        std::cout << "Output pipe ID " << intermediate_out_pipe_id << std::endl;
+    }
     else {
         std::cout << "Output pipe ID " << out_pipe_id << std::endl;
     }
@@ -718,9 +813,16 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
             throw runtime_error("[Error] In function SelectNode::SelectNode: Trying to initialize a SelectPipe node without a child");
         }
         num_children = 1;
-        left_pipe_id = child->out_pipe_id;
         left = child;
+
         processJoinChild(this);
+        if (left->type == JOIN){
+            left_pipe_id = left->intermediate_out_pipe_id;
+        }
+        else{
+            left_pipe_id = left->out_pipe_id;
+        }
+
         if (left_reader_from_join) {
             output_schema = new Schema(*(left_reader_from_join->output_schema));
         }
@@ -735,6 +837,9 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
     //out_pipe_id = next_assign_pipeID++; 
     if (specific_out_pipe_id >= 0){
         out_pipe_id = specific_out_pipe_id;
+    }
+    else if (is_intermediate){
+        out_pipe_id = -1;
     }
     else {
         out_pipe_id = getNewPipeID();
@@ -853,12 +958,20 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     type = PROJECT;
     num_children = SINGLE;
     left = child;
-    left_pipe_id = child->out_pipe_id;
-    //out_pipe_id = next_assign_pipeID++;
-    out_pipe_id = getNewPipeID();
+
+    // std::cout << "Project Node out_pipe_id: " << out_pipe_id << std::endl;
 
     Schema *input_schema = NULL;
     processJoinChild(this);
+    if (child->type == JOIN){
+        left_pipe_id = child->intermediate_out_pipe_id;
+    }
+    else{
+        left_pipe_id = child->out_pipe_id;
+    }
+    out_pipe_id = getNewPipeID();
+    // std::cout << "Project child Node name: " << child->name << std::endl;
+    // std::cout << "Project Node in_pipe_id: " << left_pipe_id << std::endl;
     if (left_reader_from_join) {
         input_schema = new Schema(*(left_reader_from_join->output_schema));
     }
@@ -873,6 +986,8 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     numAttsOutput = 0;
     while (atts != NULL) {
         char *att_name = atts->name;
+        std::cout << "^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
+        std::cout << att_name << std::endl;
         int idx = input_schema->Find(att_name);
         if (idx == NOT_FOUND) {
             throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): Trying to project non-existing attribute");
@@ -926,12 +1041,24 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     num_children = DOUBLE;
     left = left_child;
     right = right_child;
-    left_pipe_id = left->out_pipe_id;
-    right_pipe_id = right->out_pipe_id; 
+
+    processJoinChild(this);
+
+    if (left->type == JOIN){
+        left_pipe_id = left->intermediate_out_pipe_id;
+    }
+    else{
+        left_pipe_id = left->out_pipe_id;
+    }
+    if (right->type == JOIN){
+        right_pipe_id = right->intermediate_out_pipe_id;
+    }
+    else{
+        right_pipe_id = right->out_pipe_id;
+    }
     //out_pipe_id = getNewPipeID(); 
     intermediate_out_pipe_id = getNewPipeID();
 
-    processJoinChild(this);
     Schema *left_sch = NULL, *right_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -984,7 +1111,7 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     //std::cout << "1" <<std::endl;
     saveSchema(std::string(intermediate_catalog), intermediate_rel_name);
     //std::cout << "2" <<std::endl;
-    writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
+    // writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
     //std::cout << "Writer in join, in pipe: " << writer->left_pipe_id << std::endl;
     //writer->print();
     //std:cout << std::endl;
@@ -1067,10 +1194,17 @@ SumNode::SumNode(FuncOperator *agg_func, QueryPlanNode *child) {
     type = SUM;
     num_children = SINGLE;
     left = child;
-    left_pipe_id = left->out_pipe_id; // IDs of left and right input pipes corresponding to left and right children
-    out_pipe_id = getNewPipeID(); // ID of output pipe
-    
+
     processJoinChild(this);
+    if (left->type == JOIN){
+        left_pipe_id = child->intermediate_out_pipe_id;// IDs of left and right input pipes corresponding to left and right children
+    }
+    else{
+        left_pipe_id = child->out_pipe_id;
+    } 
+    out_pipe_id = getNewPipeID(); // ID of output pipe
+    std::cout << "Sum child Node name: " << child->name << std::endl;
+    std::cout << "Sum Node in_pipe_id: " << left_pipe_id << std::endl;
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1116,9 +1250,17 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     num_children = SINGLE;
     left = child;
     left_pipe_id = left->out_pipe_id; 
-    out_pipe_id = getNewPipeID(); // ID of output pipe
     
     processJoinChild(this);
+
+    if (left->type == JOIN){
+        left_pipe_id = child->intermediate_out_pipe_id;
+    }
+    else{
+        left_pipe_id = child->out_pipe_id;
+    }
+    out_pipe_id = getNewPipeID(); // ID of output pipe
+
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));

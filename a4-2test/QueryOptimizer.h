@@ -70,6 +70,11 @@ void executeQueryPlanOnlyJoin(QueryPlanNode *root, const std::map<int, Pipe*> &a
 void waitUntilExecuteDone(QueryPlanNode *root);
 void printFile(std::string filepath);
 
+int height(QueryPlanNode* node);
+void printGivenLevel(QueryPlanNode* root, int level);
+void printLevelOrder(QueryPlanNode* root);
+void printInOrderQueryPlan_BFS(QueryPlanNode *root);
+
 class QueryPlan {
     friend class QueryPlanNode;
     private:
@@ -121,6 +126,8 @@ class QueryPlan {
         void removeSelfJoinPred(std::vector<AndList*> &predicates);
         std::vector<std::string> getRelNames(AndList *single_pred);
         void printPredicate();
+        int height(QueryPlanNode* node);
+        void printGivenLevel(QueryPlanNode* root, int level);
 
         const QueryPlanNode* getRoot();
         const Pipe* getOutPipe();

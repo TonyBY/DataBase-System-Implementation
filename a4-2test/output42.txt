@@ -2,6 +2,12 @@ TC1
 enter:
 Number of selects: 1
 Number of joins: 0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nation
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_name = UNITED STATES )
+^^^^^^^^^^^^^^^^^^^^^^
+n_nationkey
 PRINTING TREE IN ORDER:
 
  ***********
@@ -41,6 +47,19 @@ TC2
 enter:
 Number of selects: 1
 Number of joins: 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+region
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_nationkey > 5 )
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_regionkey = r_regionkey )
+-----------------------------------------
+nation
+region
+^^^^^^^^^^^^^^^^^^^^^^
+n_name
 PRINTING TREE IN ORDER:
 
  ***********
@@ -68,10 +87,20 @@ CNF:
 ( n.n_nationkey > 5 )
 
  ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 2
+Output Schema:
+        Att r.r_regionkey: Int
+        Att r.r_name: String
+        Att r.r_comment: String
+
+
+ ***********
 Join operation
 Left Input Pipe 3
 Right Input Pipe 2
-Output pipe ID -1
+Output pipe ID 4
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -86,18 +115,8 @@ CNF:
 ( n.n_regionkey = r.r_regionkey )
 
  ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 2
-Output Schema:
-        Att r.r_regionkey: Int
-        Att r.r_name: String
-        Att r.r_comment: String
-
-
- ***********
 Project operation
-Input Pipe 6
+Input Pipe 4
 Output pipe ID 5
 Output Schema:
         Att n.n_name: String
@@ -108,6 +127,19 @@ TC3
 enter:
 Number of selects: 1
 Number of joins: 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+region
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_name = UNITED STATES )
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_regionkey = r_regionkey )
+-----------------------------------------
+nation
+region
+Sum child Node name: Join
+Sum Node in_pipe_id: 4
 PRINTING TREE IN ORDER:
 
  ***********
@@ -135,10 +167,20 @@ CNF:
 ( n.n_name = UNITED STATES )
 
  ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 2
+Output Schema:
+        Att r.r_regionkey: Int
+        Att r.r_name: String
+        Att r.r_comment: String
+
+
+ ***********
 Join operation
 Left Input Pipe 3
 Right Input Pipe 2
-Output pipe ID -1
+Output pipe ID 4
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -153,18 +195,8 @@ CNF:
 ( n.n_regionkey = r.r_regionkey )
 
  ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 2
-Output Schema:
-        Att r.r_regionkey: Int
-        Att r.r_name: String
-        Att r.r_comment: String
-
-
- ***********
 Sum operation
-Input Pipe 6
+Input Pipe 4
 Output pipe ID 5
 Output Schema:
         Att sum.sum: Int
@@ -175,6 +207,17 @@ TC4
 enter:
 Number of selects: 1
 Number of joins: 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+region
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_name = UNITED STATES )
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_regionkey = r_regionkey )
+-----------------------------------------
+nation
+region
 GROUPING ON n_regionkey
         Att n_regionkey: Int
 
@@ -205,10 +248,20 @@ CNF:
 ( n.n_name = UNITED STATES )
 
  ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 2
+Output Schema:
+        Att r.r_regionkey: Int
+        Att r.r_name: String
+        Att r.r_comment: String
+
+
+ ***********
 Join operation
 Left Input Pipe 3
 Right Input Pipe 2
-Output pipe ID -1
+Output pipe ID 4
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -223,18 +276,8 @@ CNF:
 ( n.n_regionkey = r.r_regionkey )
 
  ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 2
-Output Schema:
-        Att r.r_regionkey: Int
-        Att r.r_name: String
-        Att r.r_comment: String
-
-
- ***********
 Group By operation
-Input Pipe 6
+Input Pipe 4
 Output pipe ID 5
 Output Schema:
         Att sum.sum: Int
@@ -249,6 +292,24 @@ TC5
 enter:
 Number of selects: 1
 Number of joins: 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+customer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+region
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_nationkey > 10 )
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_regionkey = r_regionkey )
+-----------------------------------------
+nation
+region
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( n_nationkey = c_nationkey )
+-----------------------------------------
+nation, region
+customer
 GROUPING ON r_regionkey
         Att r_regionkey: Int
 
@@ -279,10 +340,20 @@ CNF:
 ( n.n_nationkey > 10 )
 
  ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 3
+Output Schema:
+        Att r.r_regionkey: Int
+        Att r.r_name: String
+        Att r.r_comment: String
+
+
+ ***********
 Join operation
 Left Input Pipe 4
 Right Input Pipe 3
-Output pipe ID -1
+Output pipe ID 5
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -299,18 +370,23 @@ CNF:
  ***********
 SelectFile operation
 Input pipe 0
-Output pipe ID 3
+Output pipe ID 1
 Output Schema:
-        Att r.r_regionkey: Int
-        Att r.r_name: String
-        Att r.r_comment: String
+        Att c.c_custkey: Int
+        Att c.c_name: String
+        Att c.c_address: String
+        Att c.c_nationkey: Int
+        Att c.c_phone: String
+        Att c.c_acctbal: Double
+        Att c.c_mktsegment: String
+        Att c.c_comment: String
 
 
  ***********
 Join operation
-Left Input Pipe 7
+Left Input Pipe 5
 Right Input Pipe 1
-Output pipe ID -1
+Output pipe ID 6
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -333,24 +409,9 @@ CNF:
 ( n.n_nationkey = c.c_nationkey )
 
  ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 1
-Output Schema:
-        Att c.c_custkey: Int
-        Att c.c_name: String
-        Att c.c_address: String
-        Att c.c_nationkey: Int
-        Att c.c_phone: String
-        Att c.c_acctbal: Double
-        Att c.c_mktsegment: String
-        Att c.c_comment: String
-
-
- ***********
 Duplicate Removal operation
-Input Pipe 9
-Output pipe ID 8
+Input Pipe -1
+Output pipe ID 7
 Output Schema:
         Att n.n_nationkey: Int
         Att n.n_name: String
@@ -371,8 +432,8 @@ Output Schema:
 
  ***********
 Group By operation
-Input Pipe 8
-Output pipe ID 10
+Input Pipe 7
+Output pipe ID 8
 Output Schema:
         Att sum.sum: Int
         Att r.r_regionkey: Int
@@ -386,58 +447,28 @@ TC6
 enter:
 Number of selects: 1
 Number of joins: 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+partsupp
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+supplier
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( s_acctbal > 2500.0 )
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( s_suppkey = ps_suppkey )
+-----------------------------------------
+supplier
+partsupp
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+( p_partkey = ps_partkey )
+-----------------------------------------
+part
+supplier, partsupp
 GROUPING ON s_suppkey
         Att s_suppkey: Int
 
 PRINTING TREE IN ORDER:
-
- ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 1
-Output Schema:
-        Att p.p_partkey: Int
-        Att p.p_name: String
-        Att p.p_mfgr: String
-        Att p.p_brand: String
-        Att p.p_type: String
-        Att p.p_size: Int
-        Att p.p_container: String
-        Att p.p_retailprice: Double
-        Att p.p_comment: String
-
-
- ***********
-Join operation
-Left Input Pipe 1
-Right Input Pipe 7
-Output pipe ID -1
-Output Schema:
-        Att p.p_partkey: Int
-        Att p.p_name: String
-        Att p.p_mfgr: String
-        Att p.p_brand: String
-        Att p.p_type: String
-        Att p.p_size: Int
-        Att p.p_container: String
-        Att p.p_retailprice: Double
-        Att p.p_comment: String
-        Att s.s_suppkey: Int
-        Att s.s_name: String
-        Att s.s_address: String
-        Att s.s_nationkey: Int
-        Att s.s_phone: String
-        Att s.s_acctbal: Double
-        Att s.s_comment: String
-        Att ps.ps_partkey: Int
-        Att ps.ps_suppkey: Int
-        Att ps.ps_availqty: Int
-        Att ps.ps_supplycost: Double
-        Att ps.ps_comment: String
-
-CNF:
-CNF:
-( p.p_partkey = ps.ps_partkey )
 
  ***********
 SelectFile operation
@@ -470,10 +501,38 @@ CNF:
 ( s.s_acctbal > 2500.0 )
 
  ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 2
+Output Schema:
+        Att ps.ps_partkey: Int
+        Att ps.ps_suppkey: Int
+        Att ps.ps_availqty: Int
+        Att ps.ps_supplycost: Double
+        Att ps.ps_comment: String
+
+
+ ***********
+SelectFile operation
+Input pipe 0
+Output pipe ID 1
+Output Schema:
+        Att p.p_partkey: Int
+        Att p.p_name: String
+        Att p.p_mfgr: String
+        Att p.p_brand: String
+        Att p.p_type: String
+        Att p.p_size: Int
+        Att p.p_container: String
+        Att p.p_retailprice: Double
+        Att p.p_comment: String
+
+
+ ***********
 Join operation
 Left Input Pipe 4
 Right Input Pipe 2
-Output pipe ID -1
+Output pipe ID 5
 Output Schema:
         Att s.s_suppkey: Int
         Att s.s_name: String
@@ -493,21 +552,41 @@ CNF:
 ( s.s_suppkey = ps.ps_suppkey )
 
  ***********
-SelectFile operation
-Input pipe 0
-Output pipe ID 2
+Join operation
+Left Input Pipe 1
+Right Input Pipe 5
+Output pipe ID 6
 Output Schema:
+        Att p.p_partkey: Int
+        Att p.p_name: String
+        Att p.p_mfgr: String
+        Att p.p_brand: String
+        Att p.p_type: String
+        Att p.p_size: Int
+        Att p.p_container: String
+        Att p.p_retailprice: Double
+        Att p.p_comment: String
+        Att s.s_suppkey: Int
+        Att s.s_name: String
+        Att s.s_address: String
+        Att s.s_nationkey: Int
+        Att s.s_phone: String
+        Att s.s_acctbal: Double
+        Att s.s_comment: String
         Att ps.ps_partkey: Int
         Att ps.ps_suppkey: Int
         Att ps.ps_availqty: Int
         Att ps.ps_supplycost: Double
         Att ps.ps_comment: String
 
+CNF:
+CNF:
+( p.p_partkey = ps.ps_partkey )
 
  ***********
 Group By operation
-Input Pipe 9
-Output pipe ID 8
+Input Pipe 6
+Output pipe ID 7
 Output Schema:
         Att sum.sum: Double
         Att s.s_suppkey: Int
