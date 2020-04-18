@@ -1395,14 +1395,21 @@ void GroupByNode::execute(const std::map<int, Pipe*> &pipes) {
 DupRemovalNode::DupRemovalNode() {}
 
 DupRemovalNode::DupRemovalNode(QueryPlanNode *child) {
-    name = "Duplicate Removal";
+    // name = "Duplicate Removal";
+    name = "Distinct";
     type = DUP_REMOVAL;
     num_children = SINGLE;
     left = child;
-    left_pipe_id = left->out_pipe_id; // IDs of left and right input pipes corresponding to left and right children
-    out_pipe_id = getNewPipeID(); // ID of output pipe
     
     processJoinChild(this);
+
+    if (child->type == JOIN){
+        left_pipe_id = child->intermediate_out_pipe_id;
+    }
+    else{
+        left_pipe_id = child->out_pipe_id;
+    }
+    out_pipe_id = getNewPipeID();
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));

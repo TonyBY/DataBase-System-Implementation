@@ -348,8 +348,8 @@ CNF:
 ( n.n_nationkey = c.c_nationkey )
 
  ***********
-Duplicate Removal operation
-Input Pipe -1
+Distinct operation
+Input Pipe 6
 Output pipe ID 7
 Output Schema:
         Att n.n_nationkey: Int
