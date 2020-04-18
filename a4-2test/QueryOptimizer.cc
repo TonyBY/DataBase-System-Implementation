@@ -330,8 +330,8 @@ void QueryPlan::createLoadDataNodes() {
         }
     }
     for (std::map<std::string, int>::iterator it = all_need_rels.begin(); it != all_need_rels.end(); it++) {
-        std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
-        std::cout << it->first << std::endl;
+        // std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
+        // std::cout << it->first << std::endl;
         SelectNode *leaf = new SelectNode(SELECT_FILE, NULL, NULL, false, (char*)catalog_path, (char*)(it->first.c_str()));
         leaves.push_back(leaf);
         relname_node[it->first] = leaf; // it->first if the relation name string
@@ -372,8 +372,8 @@ void QueryPlan::updateRelnameNodeMap(QueryPlanNode *new_root, QueryPlanNode *lef
 QueryPlanNode* QueryPlan::createPredicateNodes() {
     QueryPlanNode *new_root = NULL;
     for (int i = 0; i < min_order.size(); i++) {
-        std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-        std::cout << Util::ParseTreeToString(min_order[i]) << std::endl;
+        // std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+        // std::cout << Util::ParseTreeToString(min_order[i]) << std::endl;
         std::vector<std::string> relnames = getRelNames(min_order[i]);
         if (relnames.size() == 1) {
             // select pipe node
@@ -392,19 +392,19 @@ QueryPlanNode* QueryPlan::createPredicateNodes() {
             std::string cur_rel_right = relnames[1];
             QueryPlanNode *left = relname_node[cur_rel_left];
             QueryPlanNode *right = relname_node[cur_rel_right];
-            std::cout << "-----------------------------------------" << std::endl;
-            if (node_relnames[left].size() == 1) {
-                std::cout << node_relnames[left][0] << std::endl;
-            }
-            else{
-                std::cout << node_relnames[left][0] << ", " << node_relnames[left][1] << std::endl;
-            }
-            if (node_relnames[right].size() == 1) {
-                std::cout << node_relnames[right][0] << std::endl;
-            }
-            else{
-                std::cout << node_relnames[right][0] << ", " << node_relnames[right][1] << std::endl;
-            }
+            // std::cout << "-----------------------------------------" << std::endl;
+            // if (node_relnames[left].size() == 1) {
+            //     std::cout << node_relnames[left][0] << std::endl;
+            // }
+            // else{
+            //     std::cout << node_relnames[left][0] << ", " << node_relnames[left][1] << std::endl;
+            // }
+            // if (node_relnames[right].size() == 1) {
+            //     std::cout << node_relnames[right][0] << std::endl;
+            // }
+            // else{
+            //     std::cout << node_relnames[right][0] << ", " << node_relnames[right][1] << std::endl;
+            // }
             JoinNode *join_node = new JoinNode(min_order[i], left, right);
             //relname_node[cur_rel_left] = join_node;
             //relname_node[cur_rel_right] = join_node;
@@ -986,8 +986,8 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     numAttsOutput = 0;
     while (atts != NULL) {
         char *att_name = atts->name;
-        std::cout << "^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
-        std::cout << att_name << std::endl;
+        // std::cout << "^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
+        // std::cout << att_name << std::endl;
         int idx = input_schema->Find(att_name);
         if (idx == NOT_FOUND) {
             throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): Trying to project non-existing attribute");
@@ -1203,8 +1203,8 @@ SumNode::SumNode(FuncOperator *agg_func, QueryPlanNode *child) {
         left_pipe_id = child->out_pipe_id;
     } 
     out_pipe_id = getNewPipeID(); // ID of output pipe
-    std::cout << "Sum child Node name: " << child->name << std::endl;
-    std::cout << "Sum Node in_pipe_id: " << left_pipe_id << std::endl;
+    // std::cout << "Sum child Node name: " << child->name << std::endl;
+    // std::cout << "Sum Node in_pipe_id: " << left_pipe_id << std::endl;
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1276,6 +1276,10 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     int num_atts = 0;
     std::string numAttsStr, whichAttsStr, whichTypesStr;
     while (group_att_names != NULL) {
+
+        // std::cout << "group_att_names->name :" << std::endl;
+        // std::cout << group_att_names->name << std::endl;
+
         group_atts[num_atts].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
         strcpy(group_atts[num_atts].name, group_att_names->name);
         //group_atts[num_atts].myType = left->output_schema->FindType(group_att_names->name);
