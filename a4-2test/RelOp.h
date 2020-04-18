@@ -22,7 +22,7 @@ class RelationalOp {
 	
 	// original 
 	//virtual void WaitUntilDone () = 0;
-	// Changed by yifan
+	// Changed by Yang Bai
 	void WaitUntilDone () {pthread_join (worker, NULL);}
 
 	// tell us how much internal memory the operation can use

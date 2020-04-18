@@ -38,7 +38,7 @@ public:
 	Record ();
 	~Record();
 
-	// Added by Yifan wang
+	// Added by Yang Bai
 	int length();
 	
 	template <typename T>

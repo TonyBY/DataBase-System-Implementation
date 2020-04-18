@@ -63,7 +63,7 @@ public:
 
 	~Schema ();
 
-	// Added by Yifan
+	// Added by Yang Bai
 	std::string toString();
 };
 

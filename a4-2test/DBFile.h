@@ -39,18 +39,12 @@ struct BigQSuite {
 class GenericDBFile {
 	protected:
 		fType m_fileType;
-		//File* m_file;
-
-		DBFBase* m_file; // = DBFBase(m_file);
+		DBFBase* m_file;
 		DBFBase* m_cache;
 		string m_file_path;
 		string m_cache_path;
-	
-		//Page m_currentPage;
-		//off_t m_currentDataPageIdx;
 
 	public:
-		//virtual int Open (const char *fpath) {}
 		virtual ~GenericDBFile() {}
 		virtual int Create (const char *fpath, fType file_type, void *startup) {}
 		virtual int Close () {}
@@ -69,10 +63,7 @@ class Heap : public virtual GenericDBFile {
 	public:
 		Heap(DBFBase* file, DBFBase* cache, string fpath, string cache_path);
 		~Heap() {}
-		//Heap(const char *fpath);
-		//fType getFileType();
 		int Create (const char *fpath, fType file_type, void *startup);
-		//int Open (const char *fpath) {return m_fbase.Open(fpath);};
 		int Close ();
 		void Load (Schema &myschema, const char *loadpath);
 		void MoveFirst ();
@@ -123,9 +114,6 @@ class Sorted : public virtual GenericDBFile {
 		}
 		
 		void moveCacheToFile() {
-			//cout << "file length move: " << m_file->file->GetLength() << endl;
-	        //cout << "cache length move: " << m_cache->file->GetLength() << endl;
-
 			if (m_cache->file->GetLength() <= 1) {
 				return;
 			}
@@ -143,17 +131,13 @@ class Sorted : public virtual GenericDBFile {
 			emptyFile(m_cache_path);
 			m_cache->Open(m_cache_path.c_str());
 			m_cache->MoveFirst();
-			//cout << "file length After move: " << m_file->file->GetLength() << endl;
-    	    //cout << "cache length After move: " << m_cache->file->GetLength() << endl;
 		}
 		
 	public:
 		Sorted() {}
 		Sorted(OrderMaker myOrder, int runLength, DBFBase* file, DBFBase* cache,  string fpath, string cache_path);
 		~Sorted() {}
-		//fType getFileType();
 		int Create (const char *fpath, fType file_type, void *startup);
-		//int Open (const char *fpath);
 		int Close ();
 		void Load (Schema &myschema, const char *loadpath);
 		void MoveFirst ();
@@ -162,7 +146,6 @@ class Sorted : public virtual GenericDBFile {
 		
 		int GetNextByBinarySearch (Record &fetchme, CNF &cnf, Record &literal);
 		int GetNext (Record &fetchme, CNF &cnf, Record &literal);
-		//int Sorted::GetNextNoFlush (Record &fetchme);
 		OrderMaker getOrder();
 		
 }; 
@@ -170,7 +153,6 @@ class Sorted : public virtual GenericDBFile {
 class DBFile {
 
 public:
-	//fstream* meta;
 	DBFBase* m_file; 
 	DBFBase* m_cache;
 	string m_metaPath;
@@ -197,15 +179,6 @@ public:
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
 	
 private: 
-	//Record currentRecord;
-	// Since the first page has no data, we only need to record the index of current page with data
-	// So when currentDataPageIdx == 0, it means we are at the first DATA page, which is actually the second page in file.
-	// currentDataPageIdx is 0-based.
-	//Page currentPage;
-	//off_t currentDataPageIdx;
-	//fType myType;
-	//File* m_file;
-	
 	string m_file_path;
 	string m_cache_path;
 	GenericDBFile* m_instance;

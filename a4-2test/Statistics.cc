@@ -76,7 +76,6 @@ void Statistics::AddRel(char *relName, int numTuples)
     }  
 }
 
-// Update allowed
 void Statistics::AddAtt(char *relName, char *attName, int numDistincts)
 {
     std::string relation_name(relName);
@@ -86,22 +85,19 @@ void Statistics::AddAtt(char *relName, char *attName, int numDistincts)
         std::cerr << "[Error] In function Statistics::AddAtt(): Relation '" << relation_name << "' does not exist in Statistics" << std::endl;     
     }
     else
-    { // relation name exists 
+    { 
         if (numDistincts == -1) 
         {
             numDistincts = data[relation_name].numTuples;
         }
     
         if (exists<std::string, AttributeInfo>(data[relation_name].data, att_name))
-        { // att name exists in the relation
-            //std::cerr << "[Warning] In function Statistics::AddAtt(): Attribute '" << att_name << "' has existed in Relation '" << relation_name << "', it will be updated." << std::endl;     
+        {
             data[relation_name].data[att_name].numDistincts = numDistincts;
         }
         else 
         {
             data[relation_name].data[att_name] = AttributeInfo(att_name, numDistincts);
-            //AttributeInfo tmp(att_name, numDistincts);
-            //data[relation_name].data[att_name] = tmp;
         }
     }
 }
@@ -124,7 +120,6 @@ void Statistics::CopyRel(char *oldName, char *newName)
             //data.erase(old_name);
             joined_relations[new_name] = &(data[new_name]);
         }
-        // else, old_name == new_name, do nothing
     }
 }
 
@@ -144,7 +139,7 @@ void Statistics::Read(char *fromWhere)
 {
     std::ifstream in_file(fromWhere);
     if (!in_file.is_open()) 
-    { // fromWhere not exists
+    { 
         std::ofstream empty_file(fromWhere);
         empty_file.close();
         std::cerr << "[Warning] In function Statistics::Read(): trying to read an object from a non-existing file" << std::endl;
@@ -244,13 +239,11 @@ RelationInfo* Statistics::applyJoin(double &est_num_tuples_after_join,
 {
     RelationInfo *relation_left = NULL, *relation_right = NULL;
     int num_dictincts_left = 0, num_dictincts_right = 0;
-    // left att exists in relation 1 while right att in relation 2
     if (exists<std::string, AttributeInfo>(relation1->data, att_name_left) && exists<std::string, AttributeInfo>(relation2->data, att_name_right))
     {
         relation_left = relation1;
         relation_right = relation2;
     }
-    // left att exists in relation 2 while right att in relation 1
     else if (exists<std::string, AttributeInfo>(relation2->data, att_name_left) && exists<std::string, AttributeInfo>(relation1->data, att_name_right))
     {
         relation_left = relation2;
@@ -266,7 +259,6 @@ RelationInfo* Statistics::applyJoin(double &est_num_tuples_after_join,
     num_dictincts_left = relation_left->data.at(att_name_left).numDistincts;
     num_dictincts_right = relation_right->data.at(att_name_right).numDistincts;
 
-    // Add the new resulting relation after joining
     int larger = std::max(num_dictincts_left, num_dictincts_right);
     int new_num_tuples = relation_left->numTuples * (relation_right->numTuples / (double)larger);
     est_num_tuples_after_join = est_num_tuples1 * (est_num_tuples2 / (double)larger);
@@ -282,19 +274,13 @@ RelationInfo* Statistics::applyJoin(double &est_num_tuples_after_join,
         AddAtt((char*)(new_rel_name.c_str()), (char*)(it->second.name.c_str()), it->second.numDistincts);
     }
     
-    // Update partitions (joined_relations)
     for (int i = 0; i < numToJoin; i++)
     {
         joined_relations[std::string(relNames[i])] = &(data.at(new_rel_name));
     }
 
-    // Remove old relations
     data.erase(relation_left->name);
     data.erase(relation_right->name);
-    // Note: When AddRel(new_rel_name, ...), we add new joined relation to both of data and joined_relations
-    // But joined_relations should only contains single relation names as its keys. 
-    // In our design, the keys in joined_relations should NOT be joined relation names.
-    // So we need remove this new joined relation name from joined_relations. 
     joined_relations.erase(new_rel_name);
 
     return &(data.at(new_rel_name));
@@ -342,13 +328,11 @@ std::vector<double> Statistics::estimateSelectRatio(RelationInfo *relation1, Rel
                 att_name = std::string(comp_op->right->value);
             }
 
-            // att exists in relation 1
             if (relation1 != NULL && exists<std::string, AttributeInfo>(relation1->data, att_name))
             {
                 relation = relation1;
                 which_rel = 0;
             }
-            // att exists in relation 2
             else if (relation2 != NULL && exists<std::string, AttributeInfo>(relation2->data, att_name))
             {
                 relation = relation2;
@@ -404,19 +388,13 @@ std::vector<double> Statistics::estimateSelectRatio(RelationInfo *relation1, Rel
 
     for (int i = 0; i < 2; i++)
     {
-        //if (ratio_num_tuples[i] >= 0)
-        //{
-            res_ratio.push_back(ratio_num_tuples[i]);
-            //AddRel((char*)(relations[i]->name.c_str()), relations[i]->numTuples * ratio_num_tuples[i]);
-        //}
+        res_ratio.push_back(ratio_num_tuples[i]);
     }
     
     return res_ratio;
 
 }
 
-
-// Unlike join, when we apply selection, we must pass a whole OrList, instead of single ComparisonOp  
 void Statistics::applySelect(RelationInfo *relation1, RelationInfo *relation2, 
                              double &est_num_tuples1, double &est_num_tuples2,   
                              struct OrList *or_list)
@@ -481,11 +459,8 @@ void Statistics::Apply(struct AndList *parseTree, char *relNames[], int numToJoi
                 comp_op = or_list->left;
                 if (comp_op != NULL)
                 {
-                    // Join using attribute equality -> "(att1 = att2)"
                     if (comp_op->left->code == NAME && comp_op->right->code == NAME)
                     {
-                        // In this case, we require there are two different relations 
-                        // That is, neither relation1 or relation2 is NULL
                         if (relation1 == NULL || relation2 == NULL)
                         {
                             throw std::runtime_error("[Error] In function Statistics::Apply(): no enough relations to be joined");
@@ -503,7 +478,6 @@ void Statistics::Apply(struct AndList *parseTree, char *relNames[], int numToJoi
 
                         or_list = or_list->rightOr;
                     }
-                    // Selection that only involves one relation -> "(att1 > 10)"
                     else
                     {
                         applySelect(relation1, relation2, 

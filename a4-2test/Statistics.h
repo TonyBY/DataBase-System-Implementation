@@ -25,7 +25,7 @@ class RelationInfo
 {
 	public:
 		std::string name;
-		int numTuples; // the number of tuples 
+		int numTuples; 
 		std::map<std::string, AttributeInfo> data;
 		
 		RelationInfo();
@@ -34,18 +34,15 @@ class RelationInfo
 };
 
 class Statistics
-{
-private:
-	//std::unordered_map<std::string, RelationInfo> data;
-	
+{	
 public:
 
 	double final_est_num_tuples;
-	std::map<std::string, RelationInfo*> joined_relations; // points to RelationInfo in data
+	std::map<std::string, RelationInfo*> joined_relations;
 	std::map<std::string, RelationInfo> data;
 	
 	Statistics();
-	Statistics(Statistics &copyMe);	 // Performs deep copy
+	Statistics(Statistics &copyMe);
 	~Statistics();
 
 	void AddRel(char *relName, int numTuples);

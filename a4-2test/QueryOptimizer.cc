@@ -406,8 +406,7 @@ QueryPlanNode* QueryPlan::createPredicateNodes() {
             //     std::cout << node_relnames[right][0] << ", " << node_relnames[right][1] << std::endl;
             // }
             JoinNode *join_node = new JoinNode(min_order[i], left, right);
-            //relname_node[cur_rel_left] = join_node;
-            //relname_node[cur_rel_right] = join_node;
+ 
             updateRelnameNodeMap(join_node, left, right);
             new_root = join_node;
         }
@@ -434,14 +433,7 @@ void QueryPlan::createDupRemovalNodes() {
 
 void QueryPlan::createSumNodes() {
     QueryPlanNode *new_root = NULL;
-    //if (groupingAtts) {
-    //    if (distinctFunc) {
-            //new_root = new DupRemovalNode();
-    //        createDupRemovalNodes();
-    //    }
-        //new_root = new GroupByNode();
-    //    createGroupByNodes();
-    //} 
+
     if (finalFunction && !groupingAtts) {
         new_root = new SumNode(finalFunction, this->root);
         this->root = new_root;
@@ -576,16 +568,7 @@ double QueryPlan::estimateTotalCost(std::vector<AndList*> &whole_pred) {
 
 void QueryPlan::getRelsForStat(char* relNames[], int &numToJoin, AndList *single_pred, Statistics *tmp_stat){
     std::vector<std::string> rels = getRelNames(single_pred);
-    //char* relNames[MAX_NUM_RELS];
-    //int numToJoin = 0;
-//    if (rels.size() == 1) {
-        // predicate is selection
-//        relNames[0] = (char*)rels[0].c_str();
-//        numToJoin = 1;
-//    }
-//    else {
-        // join
-        //std::vector<std::string> all_orig_rels;
+
     std::vector<std::string> src_joined_rel1 = Util::splitString(tmp_stat->joined_relations[rels[0]]->name, '&'); 
         //relNames = (char**) malloc (numToJoin * sizeof(char*)); 
     for (int i = 0; i < src_joined_rel1.size(); i++) {

@@ -24,7 +24,7 @@ Record :: ~Record () {
  * Each element in bits is a char of the record which is 1-byte long
  * So length of bits is represented in byte initially
  *  
- * -- Added by Yifan Wang
+ * -- Added by Yang Bai
  */
 int Record :: length() {
     if (bits == NULL) {

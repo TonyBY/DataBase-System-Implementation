@@ -196,7 +196,7 @@ void q4 () {
 		
 		//cnf_p_ps.Print();
 		
-		// Added by yifan
+		// Added by Yang Bai
 		int numAttsLeft = sAtts;
 		int numAttsRight = psAtts;
 		int attsToKeep[] = {0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4};
@@ -302,7 +302,7 @@ void q6 () {
 		CNF cnf_p_ps;
 		Record lit_p_ps;
 		get_cnf ("(s_suppkey = ps_suppkey)", s->schema(), ps->schema(), cnf_p_ps, lit_p_ps);
-		// Added by yifan
+		// Added by Yang Bai
 		int numAttsLeft = sAtts;
 		int numAttsRight = psAtts;
 		int attsToKeep[] = {0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4};
