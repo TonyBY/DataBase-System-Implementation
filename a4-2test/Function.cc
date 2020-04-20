@@ -235,8 +235,27 @@ void Function :: Print () {
 			}
 		}
 	}
-	std::cout << std::endl;
+	// std::cout << std::endl;
 }
+
+// void Function :: Print () {
+//   const char* opNames[14] = {
+//     "PushInt", "PushDouble", "ToDouble", "ToDouble2Down", 
+//     "IntUnaryMinus", "IntMinus", "IntPlus", "IntDivide", "IntMultiply",
+//     "DblUnaryMinus", "DblMinus", "DblPlus", "DblDivide", "DblMultiply"
+//   };
+// //   FATALIF(!opList, "Uninitialized function.");
+//   if (!opList){
+// 	printf("FATAL [%s:%d] ", __FILE__, __LINE__);
+// 	printf("Uninitialized function.");
+// 	printf("\n");
+// 	assert(1==2);
+// 	exit(-1);
+//   }
+
+//   for (int i=0; i<numOps; ++i)
+//     std::cout << opList[i].recInput << " " << opNames[opList[i].myOp] << std::endl;
+// }
 
 Type Function :: Apply (Record &toMe, int &intResult, double &doubleResult) {
 

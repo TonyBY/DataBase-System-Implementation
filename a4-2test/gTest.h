@@ -24,7 +24,5 @@ extern "C" struct YY_BUFFER_STATE *yy_scan_string(const char*);
 extern "C" int yyparse (void);
 
 extern struct AndList *boolean;
-//struct AndList *final;
-
 
 #endif

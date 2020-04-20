@@ -6,13 +6,13 @@ ifdef linux
 tag = -n
 endif
 
-all: a42.out myGtest.out #tt.out#test_p1.out test_p2.out# test_p3.out
+all: a42.out gTest.out #tt.out#test_p1.out test_p2.out# test_p3.out
 
 a42.out: Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o lex.yy.o test.o
 	$(CC) -o a42.out Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o lex.yy.o test.o -lfl -lpthread
 
-myGtest.out: Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o myGtest.o
-	$(CC) -o myGtest.out Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o myGtest.o -lfl -lpthread -lgtest
+gTest.out: Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o gTest.o
+	$(CC) -o gTest.out Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o gTest.o -lfl -lpthread -lgtest
 
 #test.out: Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o tt.o
 #	$(CC) -o test.out Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFBase.o DBFile.o Pipe.o BigQ.o RelOp.o Function.o Statistics.o QueryOptimizer.o y.tab.o yyfunc.tab.o lex.yy.o lex.yyfunc.o tt.o -lfl -lpthread -lgtest
@@ -29,8 +29,8 @@ myGtest.out: Util.o Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBF
 test.o: test.cc
 	$(CC) -g -c test.cc
 
-myGtest.o: myGtest.cc
-	$(CC) -g -c myGtest.cc
+gTest.o: gTest.cc
+	$(CC) -g -c gTest.cc
 
 #tt.o: tt.cc
 #	$(CC) -g -c tt.cc

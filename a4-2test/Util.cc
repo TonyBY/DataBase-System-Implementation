@@ -200,12 +200,18 @@ void Util::removeRelNameFromPred(FuncOperator* func) {
 void Util::addRelNameBackToPred(ComparisonOp* predicate) {
     if (predicate->left->code == NAME) {
         std::string left_name(predicate->left->value);
+        if(!left_name.find('_')){
+            return;
+        }
         std::string left_prefix = getPrefix(left_name, '_');
         left_name = left_prefix + "." + left_name;
         strcpy(predicate->left->value, left_name.c_str());
     }
     if (predicate->right->code == NAME) {
         std::string right_name(predicate->right->value);
+        if(!right_name.find('_')){
+            return;
+        }
         std::string right_prefix = getPrefix(right_name, '_');
         right_name = right_prefix + "." + right_name;
         strcpy(predicate->right->value, right_name.c_str());

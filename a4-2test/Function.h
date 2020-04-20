@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <assert.h>
 #define MAX_DEPTH 100
 
 

@@ -301,15 +301,22 @@ void QueryPlan::createPlanTree() {
     std::cout << "Number of selects: " << number_of_selects << std::endl;
     std::cout << "Number of joins: " << number_of_joins << std::endl;
     createLoadDataNodes();  
+    // printf("DONE: createLoadDataNodes\n");
     //for (int i = 0 ; i < leaves.size(); i++) {
     //    leaves[i]->print();
     //}
     createPredicateNodes();
+    // printf("DONE: createPredicateNodes\n");
     //printQueryPlanTree(root);
-    createProjectNodes();
-    createDupRemovalNodes();
-    createSumNodes();
     createGroupByNodes();
+    // printf("DONE: createGroupByNodes\n");
+    createSumNodes();
+    // printf("DONE: createSumNodes\n");
+    createProjectNodes();
+    // printf("DONE: createProjectNodes\n");
+    createDupRemovalNodes();
+    // printf("DONE: createDupRemovalNodes\n");
+    
     // createWriteOutNodes(std::string(tpch_dir) + answers_relname + std::string(tpch_ext_name));
     // root->saveSchema(answers_catalog, answers_relname);
 }
@@ -418,10 +425,12 @@ QueryPlanNode* QueryPlan::createPredicateNodes() {
 
 void QueryPlan::createProjectNodes() {
     // std::cout << attsToSelect << std::endl;
-    if (attsToSelect && !finalFunction && !groupingAtts) {
-        QueryPlanNode *new_root = new ProjectNode(attsToSelect, this->root);
-        this->root = new_root;
-    }
+    // if (attsToSelect && !finalFunction && !groupingAtts) {
+    //     QueryPlanNode *new_root = new ProjectNode(attsToSelect, this->root);
+    //     this->root = new_root;
+    // }
+    QueryPlanNode *new_root = new ProjectNode(attsToSelect, this->root);
+    this->root = new_root;
 }
 
 void QueryPlan::createDupRemovalNodes() {
@@ -434,7 +443,12 @@ void QueryPlan::createDupRemovalNodes() {
 void QueryPlan::createSumNodes() {
     QueryPlanNode *new_root = NULL;
 
-    if (finalFunction && !groupingAtts) {
+    // if (finalFunction && !groupingAtts) {
+    //     new_root = new SumNode(finalFunction, this->root);
+    //     this->root = new_root;
+    // }
+
+    if (finalFunction) {
         new_root = new SumNode(finalFunction, this->root);
         this->root = new_root;
     }
@@ -836,7 +850,7 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
         cnf = new CNF();
         literal = new Record();
         cnf->GrowFromParseTree(select_conditions, output_schema, *literal);
-        Util::addRelNameBackToPred(select_conditions);
+        // Util::addRelNameBackToPred(select_conditions);
         CNF_string = Util::ParseTreeToString(select_conditions); 
         //Attribute lit_att = {"val", Int};
         //literal->Print(new Schema("", 1, &lit_att));
@@ -934,7 +948,10 @@ void SelectFileNode::printSpecInfo() {
 ProjectNode::ProjectNode() {}
 
 ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
-    if (atts == NULL || child == NULL) {
+    // if (atts == NULL || child == NULL) {
+    //     throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): atts and child must be both not null");
+    // }
+     if (child == NULL) {
         throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): atts and child must be both not null");
     }
     name = "Project";
@@ -961,6 +978,13 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     else {
         input_schema = new Schema(*(left->output_schema));
     } 
+
+    // std::cout << "Project input sch: " << input_schema->toString() << std::endl;
+
+    if (child->type == SUM){
+         output_schema = input_schema;
+         return;
+    }
 
     Attribute *input_atts = input_schema->GetAtts();
     numAttsInput = input_schema->GetNumAtts();
@@ -1065,7 +1089,7 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     numAttsRight = right->output_schema->GetNumAtts();
 	*/
     cnf->GrowFromParseTree(join_statement, left_sch, right_sch, *literal);
-    Util::addRelNameBackToPred(join_statement);
+    // Util::addRelNameBackToPred(join_statement);
     CNF_string = Util::ParseTreeToString(join_statement);
 	//this->literal = literal;
 	numAttsLeft = left_sch->GetNumAtts();
@@ -1196,15 +1220,60 @@ SumNode::SumNode(FuncOperator *agg_func, QueryPlanNode *child) {
         left_sch = new Schema(*(left->output_schema));
     }
 
+    // std::cout << "SUM input sch: " << left_sch->toString() << std::endl;
+
     func = new Function();
     //func->GrowFromParseTree(agg_func, *(left->output_schema));
     func->GrowFromParseTree(agg_func, *left_sch);
     Type sum_type = func->getReturnType();
 
-    Attribute output_atts = {"sum", sum_type};
-    output_schema = new Schema("", 1, &output_atts);
+    
 
-    //delete left_sch;
+    Attribute *output_atts = new Attribute[MAX_NUM_ATTS];
+    output_atts[0].name = "sum";
+    output_atts[0].myType = func->getReturnType();
+    output_schema = new Schema("", 1, output_atts);
+    // if (!groupingAtts){
+        
+    //     output_schema = new Schema("", 1, output_atts);
+    // }
+    // else{
+    //     NameList *group_att_names = groupingAtts;
+    //     Attribute *group_atts = new Attribute[MAX_NUM_ATTS];
+    //     int num_atts = 0;
+    //     std::string numAttsStr, whichAttsStr, whichTypesStr;
+    //     while (group_att_names != NULL) {
+    //         // printf("1\n");
+    //         group_atts[num_atts].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
+    //         strcpy(group_atts[num_atts].name, group_att_names->name);
+    //         //group_atts[num_atts].myType = left->output_schema->FindType(group_att_names->name);
+    //         group_atts[num_atts].myType = left_sch->FindType(group_att_names->name);
+            
+    //         int idx = left_sch->Find(group_att_names->name);
+    //         if (idx == NOT_FOUND) {
+    //             throw runtime_error("[Error] In function GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, QueryPlanNode *child): Trying to group by non-existing attribute");
+    //         }
+    //         if (num_atts > 0) {
+    //             whichAttsStr += " ";
+    //             whichTypesStr += " ";
+    //         }
+    //         whichAttsStr += Util::toString<int>(idx);
+    //         whichTypesStr += TypeStr[left_sch->FindType(group_att_names->name)];
+
+    //         std::cout << group_att_names->name << std::endl;
+    //         std::cout << left_sch->FindType(group_att_names->name) << std::endl;
+
+    //         num_atts++;
+    //         group_att_names = group_att_names->next;
+    //     }
+    //     std::cout << num_atts << std::endl;
+    //     for (int i = 0; i < num_atts; i++) {
+    //         output_atts[1+i].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
+    //         strcpy(output_atts[1+i].name, group_atts[i].name);
+    //         output_atts[1+i].myType = group_atts[i].myType;
+    //     }
+    //     output_schema = new Schema("", num_atts+1, output_atts);
+    // }
 
 }
 
@@ -1215,8 +1284,10 @@ SumNode::~SumNode() {
 }
 
 void SumNode::printSpecInfo() {
-    // std::cout << "Aggregation Function (represented in Reverse Polish notation):" << std::endl;
-    // func->Print();
+    // std::cout << "Aggregate function (in Reverse Polish notation): " << std::endl;
+    std::cout << "SUM ( ";
+    func->Print();
+    std::cout << ") (in Reverse Polish notation): " << std::endl;
 }
 
 void SumNode::execute(const std::map<int, Pipe*> &pipes) {
@@ -1298,59 +1369,28 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     numAttsStr = Util::toString<int>(num_atts);
 
     // std::cout << "GROUPBY input sch: " << std::endl << left_sch->toString() << std::endl;
-
-
-    //std::cout << "WhichAtts " << whichAttsStr << "WhichType: " << whichTypesStr << std::endl;
-    /*
-    Attribute *input_atts = left_sch->GetAtts();
-    int numAttsInput = left_sch->GetNumAtts();
-    Attribute *keep_atts = (Attribute*) malloc (numAttsInput * sizeof(Attribute));
-    int *keepMe = (int*) malloc (numAttsInput * sizeof(int));
-    int numAttsOutput = 0;
-    while (group_att_names != NULL) {
-        char att_name[MAX_LEN_ATTNAME];
-        strcpy(att_name, group_att_names->name);
-        int idx = left_sch->Find(att_name);
-        if (idx == NOT_FOUND) {
-            throw runtime_error("[Error] In function GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, QueryPlanNode *child): Trying to group by non-existing attribute");
-        }
-        keepMe[numAttsOutput] = idx;
-        keep_atts[numAttsOutput].name = att_name;
-        keep_atts[numAttsOutput].myType = input_atts[idx].myType;
-        numAttsOutput++;
-        group_att_names = group_att_names->next;
-    }
-
-    output_schema = new Schema("", numAttsOutput, keep_atts);
-    */
     
     order = new OrderMaker(numAttsStr, whichAttsStr, whichTypesStr);
+
     // std::cout << "Order: " << std::endl;
     // order->Print();
 
-    //int x;
-    //cin >> x;
-
+    output_schema = left_sch;
     
-    func = new Function();
-    //func->GrowFromParseTree(agg_func, *(left->output_schema));
-    func->GrowFromParseTree(agg_func, *left_sch);
+    // func = new Function();
+    // //func->GrowFromParseTree(agg_func, *(left->output_schema));
+    // func->GrowFromParseTree(agg_func, *left_sch);
 
-    Attribute *output_atts = new Attribute[MAX_NUM_ATTS];
-    output_atts[0].name = "sum";
-    output_atts[0].myType = func->getReturnType();
-    for (int i = 0; i < num_atts; i++) {
-        output_atts[1+i].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
-        strcpy(output_atts[1+i].name, group_atts[i].name);
-        output_atts[1+i].myType = group_atts[i].myType;
-    }
+    // Attribute *output_atts = new Attribute[MAX_NUM_ATTS];
+    // output_atts[0].name = "sum";
+    // output_atts[0].myType = func->getReturnType();
+    // for (int i = 0; i < num_atts; i++) {
+    //     output_atts[1+i].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
+    //     strcpy(output_atts[1+i].name, group_atts[i].name);
+    //     output_atts[1+i].myType = group_atts[i].myType;
+    // }
 
-    output_schema = new Schema("", num_atts+1, output_atts);
-
-    //delete[] group_atts;
-    //delete[] output_atts;
-
-    //delete left_sch;
+    // output_schema = new Schema("", num_atts+1, output_atts);
 
 }
 
@@ -1364,8 +1404,10 @@ GroupByNode::~GroupByNode() {
 void GroupByNode::printSpecInfo() {
     std::cout << "OrderMaker: " << std::endl;
     order->Print();
-    // std::cout << "Aggregate function (represented in Reverse Polish notation): " << std::endl;
+    // // std::cout << "Aggregate function (in Reverse Polish notation): " << std::endl;
+    // std::cout << "SUM ( ";
     // func->Print();
+    // std::cout << ") (in Reverse Polish notation): " << std::endl;
 }
 
 void GroupByNode::execute(const std::map<int, Pipe*> &pipes) {

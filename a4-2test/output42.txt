@@ -26,7 +26,7 @@ Output Schema:
         Att n.n_comment: String
 
 CNF:
-( n.n_name = UNITED STATES )
+( n_name = UNITED STATES )
 
  ***********
 Project operation
@@ -65,7 +65,7 @@ Output Schema:
         Att n.n_comment: String
 
 CNF:
-( n.n_nationkey > 5 )
+( n_nationkey > 5 )
 
  ***********
 SelectFile operation
@@ -93,7 +93,7 @@ Output Schema:
 
 CNF:
 CNF:
-( n.n_regionkey = r.r_regionkey )
+( n_regionkey = r_regionkey )
 
  ***********
 Project operation
@@ -132,7 +132,7 @@ Output Schema:
         Att n.n_comment: String
 
 CNF:
-( n.n_name = UNITED STATES )
+( n_name = UNITED STATES )
 
  ***********
 SelectFile operation
@@ -160,12 +160,21 @@ Output Schema:
 
 CNF:
 CNF:
-( n.n_regionkey = r.r_regionkey )
+( n_regionkey = r_regionkey )
 
  ***********
 Sum operation
 Input Pipe 4
 Output pipe ID 5
+Output Schema:
+        Att sum.sum: Int
+
+SUM ( n_nationkey ) (in Reverse Polish notation): 
+
+ ***********
+Project operation
+Input Pipe 5
+Output pipe ID 6
 Output Schema:
         Att sum.sum: Int
 
@@ -202,7 +211,7 @@ Output Schema:
         Att n.n_comment: String
 
 CNF:
-( n.n_name = UNITED STATES )
+( n_name = UNITED STATES )
 
  ***********
 SelectFile operation
@@ -230,19 +239,41 @@ Output Schema:
 
 CNF:
 CNF:
-( n.n_regionkey = r.r_regionkey )
+( n_regionkey = r_regionkey )
 
  ***********
 Group By operation
 Input Pipe 4
 Output pipe ID 5
 Output Schema:
-        Att sum.sum: Int
+        Att n.n_nationkey: Int
+        Att n.n_name: String
         Att n.n_regionkey: Int
+        Att n.n_comment: String
+        Att r.r_regionkey: Int
+        Att r.r_name: String
+        Att r.r_comment: String
 
 OrderMaker: 
 NumAtts =     1
   0:     2 Int
+
+ ***********
+Sum operation
+Input Pipe 5
+Output pipe ID 6
+Output Schema:
+        Att sum.sum: Int
+
+SUM ( n_regionkey ) (in Reverse Polish notation): 
+
+ ***********
+Project operation
+Input Pipe 6
+Output pipe ID 7
+Output Schema:
+        Att sum.sum: Int
+
 
 ***************************************************************************************************************************
 TC5
@@ -276,7 +307,7 @@ Output Schema:
         Att n.n_comment: String
 
 CNF:
-( n.n_nationkey > 10 )
+( n_nationkey > 10 )
 
  ***********
 SelectFile operation
@@ -304,7 +335,7 @@ Output Schema:
 
 CNF:
 CNF:
-( n.n_regionkey = r.r_regionkey )
+( n_regionkey = r_regionkey )
 
  ***********
 SelectFile operation
@@ -345,10 +376,10 @@ Output Schema:
 
 CNF:
 CNF:
-( n.n_nationkey = c.c_nationkey )
+( n_nationkey = c_nationkey )
 
  ***********
-Distinct operation
+Group By operation
 Input Pipe 6
 Output pipe ID 7
 Output Schema:
@@ -368,18 +399,34 @@ Output Schema:
         Att c.c_mktsegment: String
         Att c.c_comment: String
 
+OrderMaker: 
+NumAtts =     1
+  0:     4 Int
 
  ***********
-Group By operation
+Sum operation
 Input Pipe 7
 Output pipe ID 8
 Output Schema:
         Att sum.sum: Int
-        Att r.r_regionkey: Int
 
-OrderMaker: 
-NumAtts =     1
-  0:     4 Int
+SUM ( n_nationkey r_regionkey + ) (in Reverse Polish notation): 
+
+ ***********
+Project operation
+Input Pipe 8
+Output pipe ID 9
+Output Schema:
+        Att sum.sum: Int
+
+
+ ***********
+Distinct operation
+Input Pipe 9
+Output pipe ID 10
+Output Schema:
+        Att sum.sum: Int
+
 
 ***************************************************************************************************************************
 TC6
@@ -419,7 +466,7 @@ Output Schema:
         Att s.s_comment: String
 
 CNF:
-( s.s_acctbal > 2500.0 )
+( s_acctbal > 2500.0 )
 
  ***********
 SelectFile operation
@@ -470,7 +517,7 @@ Output Schema:
 
 CNF:
 CNF:
-( s.s_suppkey = ps.ps_suppkey )
+( s_suppkey = ps_suppkey )
 
  ***********
 Join operation
@@ -502,18 +549,54 @@ Output Schema:
 
 CNF:
 CNF:
-( p.p_partkey = ps.ps_partkey )
+( p_partkey = ps_partkey )
 
  ***********
 Group By operation
 Input Pipe 6
 Output pipe ID 7
 Output Schema:
-        Att sum.sum: Double
+        Att p.p_partkey: Int
+        Att p.p_name: String
+        Att p.p_mfgr: String
+        Att p.p_brand: String
+        Att p.p_type: String
+        Att p.p_size: Int
+        Att p.p_container: String
+        Att p.p_retailprice: Double
+        Att p.p_comment: String
         Att s.s_suppkey: Int
+        Att s.s_name: String
+        Att s.s_address: String
+        Att s.s_nationkey: Int
+        Att s.s_phone: String
+        Att s.s_acctbal: Double
+        Att s.s_comment: String
+        Att ps.ps_partkey: Int
+        Att ps.ps_suppkey: Int
+        Att ps.ps_availqty: Int
+        Att ps.ps_supplycost: Double
+        Att ps.ps_comment: String
 
 OrderMaker: 
 NumAtts =     1
   0:     9 Int
+
+ ***********
+Sum operation
+Input Pipe 7
+Output pipe ID 8
+Output Schema:
+        Att sum.sum: Double
+
+SUM ( ps_supplycost ) (in Reverse Polish notation): 
+
+ ***********
+Project operation
+Input Pipe 8
+Output pipe ID 9
+Output Schema:
+        Att sum.sum: Double
+
 
 ***************************************************************************************************************************
