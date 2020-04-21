@@ -850,7 +850,7 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
         cnf = new CNF();
         literal = new Record();
         cnf->GrowFromParseTree(select_conditions, output_schema, *literal);
-        // Util::addRelNameBackToPred(select_conditions);
+        Util::addRelNameBackToPred(select_conditions);
         CNF_string = Util::ParseTreeToString(select_conditions); 
         //Attribute lit_att = {"val", Int};
         //literal->Print(new Schema("", 1, &lit_att));
@@ -1089,7 +1089,7 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     numAttsRight = right->output_schema->GetNumAtts();
 	*/
     cnf->GrowFromParseTree(join_statement, left_sch, right_sch, *literal);
-    // Util::addRelNameBackToPred(join_statement);
+    Util::addRelNameBackToPred(join_statement);
     CNF_string = Util::ParseTreeToString(join_statement);
 	//this->literal = literal;
 	numAttsLeft = left_sch->GetNumAtts();
@@ -1159,8 +1159,7 @@ JoinNode::~JoinNode() {
 
 void JoinNode::printSpecInfo() {
     std::cout << "CNF:" << std::endl;
-    std::cout << "CNF:" << std::endl;
-    std::cout << CNF_string << std::endl;
+    std::cout << "        " + CNF_string << std::endl;
     // cnf->Print();
 }
 
@@ -1285,9 +1284,10 @@ SumNode::~SumNode() {
 
 void SumNode::printSpecInfo() {
     // std::cout << "Aggregate function (in Reverse Polish notation): " << std::endl;
-    std::cout << "SUM ( ";
+    std::cout << "Function (in Reverse Polish notation): " << std::endl;
+    std::cout << "        SUM ( ";
     func->Print();
-    std::cout << ") (in Reverse Polish notation): " << std::endl;
+    std::cout << ")" << std::endl;
 }
 
 void SumNode::execute(const std::map<int, Pipe*> &pipes) {

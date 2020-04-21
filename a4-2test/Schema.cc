@@ -185,8 +185,15 @@ Schema :: ~Schema () {
 std::string Schema::toString() {
 	std::string output = "";
 	for (int i = 0; i < numAtts; i++) {
-		std::string prefix = Util::getPrefix(std::string(myAtts[i].name), '_');
-		output += "        Att " + prefix + "." + std::string(myAtts[i].name) + ": " + TypeStr[myAtts[i].myType] + "\n";
+		if (std::string(myAtts[i].name).find("_")!=std::string::npos){
+			std::string prefix = Util::getPrefix(std::string(myAtts[i].name), '_');
+			output += "        Att " + prefix + "." + std::string(myAtts[i].name) + ": " + TypeStr[myAtts[i].myType] + "\n";
+			// output += "        Att " + std::string(myAtts[i].name) + ": " + TypeStr[myAtts[i].myType] + "\n";
+
+		}
+		else{
+			output += "        Att " + std::string(myAtts[i].name) + ": " + TypeStr[myAtts[i].myType] + "\n";
+		}
 	}
 	return output;
 }

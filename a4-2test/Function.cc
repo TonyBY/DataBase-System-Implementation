@@ -70,8 +70,8 @@ Type Function :: RecursivelyBuild (struct FuncOperator *parseTree, Schema &mySch
 				opList[numOps].myOp = PushInt;
 				opList[numOps].recInput = myNum;
 				opList[numOps].litInput = 0;
-
-				opList[numOps].name = std::string(parseTree->leftOperand->value);
+				std::string prefix = Util::getPrefix(std::string(parseTree->leftOperand->value), '_');
+				opList[numOps].name = prefix + "." + std::string(parseTree->leftOperand->value);
 
 				numOps++;	
 				return Int;
@@ -82,8 +82,9 @@ Type Function :: RecursivelyBuild (struct FuncOperator *parseTree, Schema &mySch
 				opList[numOps].myOp = PushDouble;
 				opList[numOps].recInput = myNum;
 				opList[numOps].litInput = 0;
-				
-				opList[numOps].name = std::string(parseTree->leftOperand->value);
+
+				std::string prefix = Util::getPrefix(std::string(parseTree->leftOperand->value), '_');
+				opList[numOps].name = prefix + "." + std::string(parseTree->leftOperand->value);
 
 				numOps++;	
 				return Double;
