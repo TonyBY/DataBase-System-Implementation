@@ -920,37 +920,10 @@ void SelectNode::execute(const std::map<int, Pipe*> &pipes) {
         //executor.WaitUntilDone();
     }
 }
-/*
-SelectFileNode::SelectFileNode() {}
-
-SelectFileNode::SelectFileNode(QueryPlanNode *child, int in_pipe_id, int out_pipe_id, 
-                                CNF *cnf, char *, char *rel_name, char* alias) {
-    name = "SelectPipe";
-    num_children = 1;
-    left = child;
-    //right = NULL;
-    left_pipe_id = in_pipe_id;
-    //right_pipe_id = -1; 
-    this->out_pipe_id = out_pipe_id; 
-    this->cnf = cnf;
-    output_schema = new Schema(catalog_path, rel_name);
-}
-
-SelectFileNode::~SelectFileNode() {
-    delete output_schema;
-}
-
-void SelectFileNode::printSpecInfo() {
-    cnf->Print();
-}
-*/
 
 ProjectNode::ProjectNode() {}
 
 ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
-    // if (atts == NULL || child == NULL) {
-    //     throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): atts and child must be both not null");
-    // }
      if (child == NULL) {
         throw runtime_error("[Error] In function ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child): atts and child must be both not null");
     }
@@ -1007,9 +980,6 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     }
 
     output_schema = new Schema("", numAttsOutput, keep_atts);
-    //delete input_schema;
-    //processJoinChild(this);
-
 }
   
 ProjectNode::~ProjectNode() {
@@ -1111,20 +1081,10 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     intermediate_rel_name = intermediate_file_prefix + std::string("_") + random_suffix;
     intermediate_file = intermediate_rel_name + std::string(tpch_ext_name);
     intermediate_catalog = intermediate_catalog_prefix + "_" + random_suffix;
-    //std::cout << "1" <<std::endl;
+
     saveSchema(std::string(intermediate_catalog), intermediate_rel_name);
-    //std::cout << "2" <<std::endl;
-    // writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
-    //std::cout << "Writer in join, in pipe: " << writer->left_pipe_id << std::endl;
-    //writer->print();
-    //std:cout << std::endl;
-    //reader = new SelectNode(SELECT_FILE, NULL, NULL, true, intermediate_catalog.c_str(), intermediate_rel_name.c_str());
-    //reader->print();
-    
-    //out_pipe_id = reader->out_pipe_id;
-    //processJoinChild(this);
-    //delete left_sch;
-    //delete right_sch;
+
+    writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
 
 }
 
@@ -1134,9 +1094,6 @@ JoinNode::~JoinNode() {
     free(attsToKeep);
     free(output_atts);
     delete output_schema;
-    //delete executor;
-    //delete writer;
-    //delete reader;
 }
 
 void JoinNode::printSpecInfo() {
