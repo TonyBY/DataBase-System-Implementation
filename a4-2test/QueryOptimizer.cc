@@ -1115,19 +1115,9 @@ void JoinNode::execute(const std::map<int, Pipe*> &pipes) {
     //std::cout << "Good" << std::endl;
     
     delete j;
-    //fclose(writer->output_file);
-    //writer->output_file = NULL;
-    
-    //fclose(writer->output_file);
-    //writer->output_file = NULL;
+
     delete writer;
 
-    //saveSchema(intermediate_catalog);
-
-    //printFile(std::string(tpch_dir) + intermediate_file);
-    //exit(1);
-    //reader->execute(pipes);
-    //executor = reader->executor;
     executor = NULL;//writer->executor;
     //sleep(2);
 }
@@ -1165,53 +1155,10 @@ SumNode::SumNode(FuncOperator *agg_func, QueryPlanNode *child) {
     func->GrowFromParseTree(agg_func, *left_sch);
     Type sum_type = func->getReturnType();
 
-    
-
     Attribute *output_atts = new Attribute[MAX_NUM_ATTS];
     output_atts[0].name = "sum";
     output_atts[0].myType = func->getReturnType();
     output_schema = new Schema("", 1, output_atts);
-    // if (!groupingAtts){
-        
-    //     output_schema = new Schema("", 1, output_atts);
-    // }
-    // else{
-    //     NameList *group_att_names = groupingAtts;
-    //     Attribute *group_atts = new Attribute[MAX_NUM_ATTS];
-    //     int num_atts = 0;
-    //     std::string numAttsStr, whichAttsStr, whichTypesStr;
-    //     while (group_att_names != NULL) {
-    //         // printf("1\n");
-    //         group_atts[num_atts].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
-    //         strcpy(group_atts[num_atts].name, group_att_names->name);
-    //         //group_atts[num_atts].myType = left->output_schema->FindType(group_att_names->name);
-    //         group_atts[num_atts].myType = left_sch->FindType(group_att_names->name);
-            
-    //         int idx = left_sch->Find(group_att_names->name);
-    //         if (idx == NOT_FOUND) {
-    //             throw runtime_error("[Error] In function GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, QueryPlanNode *child): Trying to group by non-existing attribute");
-    //         }
-    //         if (num_atts > 0) {
-    //             whichAttsStr += " ";
-    //             whichTypesStr += " ";
-    //         }
-    //         whichAttsStr += Util::toString<int>(idx);
-    //         whichTypesStr += TypeStr[left_sch->FindType(group_att_names->name)];
-
-    //         std::cout << group_att_names->name << std::endl;
-    //         std::cout << left_sch->FindType(group_att_names->name) << std::endl;
-
-    //         num_atts++;
-    //         group_att_names = group_att_names->next;
-    //     }
-    //     std::cout << num_atts << std::endl;
-    //     for (int i = 0; i < num_atts; i++) {
-    //         output_atts[1+i].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
-    //         strcpy(output_atts[1+i].name, group_atts[i].name);
-    //         output_atts[1+i].myType = group_atts[i].myType;
-    //     }
-    //     output_schema = new Schema("", num_atts+1, output_atts);
-    // }
 
 }
 
@@ -1261,9 +1208,6 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     else {
         left_sch = new Schema(*(left->output_schema));
     }
-
-    // Make OrderMaker
-    //Attribute *group_atts = (Attribute*) malloc (MAX_NUM_ATTS * sizeof(Attribute));
     
     Attribute *group_atts = new Attribute[MAX_NUM_ATTS];
     int num_atts = 0;
