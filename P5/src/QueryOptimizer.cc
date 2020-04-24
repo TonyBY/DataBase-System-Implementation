@@ -208,7 +208,7 @@ void QueryPlan::execute() {
     int num_pipes = QueryPlanNode::next_assign_pipeID;
     for (int i = 1; i < num_pipes; i++) {
         pipes[i] = new Pipe(pipe_size);
-        std::cout << "PipeID " << i << ", Addr: " << pipes[i] << std::endl;
+        // std::cout << "PipeID " << i << ", Addr: " << pipes[i] << std::endl;
     }
     if (reset) {
         std::cout << "================== [Attention!!!] Reseting all data... ==================" << std::endl;
@@ -720,13 +720,15 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
         num_children = 1;
         // left_pipe_id = child->out_pipe_id;
         left = child;
+        left_pipe_id = left->out_pipe_id;
+        
         processJoinChild(this);
-        if (left->type == JOIN){
-            left_pipe_id = left->intermediate_out_pipe_id;
-        }
-        else{
-            left_pipe_id = left->out_pipe_id;
-        }
+        // if (left->type == JOIN){
+        //     left_pipe_id = left->intermediate_out_pipe_id;
+        // }
+        // else{
+        //     left_pipe_id = left->out_pipe_id;
+        // }
 
         if (left_reader_from_join) {
             output_schema = new Schema(*(left_reader_from_join->output_schema));
@@ -830,18 +832,18 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     type = PROJECT;
     num_children = SINGLE;
     left = child;
-    // left_pipe_id = child->out_pipe_id;
+    left_pipe_id = child->out_pipe_id;
     // out_pipe_id = getNewPipeID();
 
     Schema *input_schema = NULL;
     processJoinChild(this);
 
-    if (child->type == JOIN){
-        left_pipe_id = child->intermediate_out_pipe_id;
-    }
-    else{
-        left_pipe_id = child->out_pipe_id;
-    }
+    // if (child->type == JOIN){
+    //     left_pipe_id = child->intermediate_out_pipe_id;
+    // }
+    // else{
+    //     left_pipe_id = child->out_pipe_id;
+    // }
     out_pipe_id = getNewPipeID();
 
     if (left_reader_from_join) {
@@ -870,8 +872,6 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     }
 
     output_schema = new Schema("", numAttsOutput, keep_atts);
-    //delete input_schema;
-    //processJoinChild(this);
 
 }
 
@@ -908,11 +908,14 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     left = left_child;
     right = right_child;
     left_pipe_id = left->out_pipe_id;
-    right_pipe_id = right->out_pipe_id; 
-    //out_pipe_id = getNewPipeID(); 
-    intermediate_out_pipe_id = getNewPipeID();
+    right_pipe_id = right->out_pipe_id;
 
     processJoinChild(this);
+  
+    out_pipe_id = next_assign_pipeID - 1; 
+    intermediate_out_pipe_id = getNewPipeID();
+
+    
     Schema *left_sch = NULL, *right_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1002,9 +1005,11 @@ SumNode::SumNode(FuncOperator *agg_func, QueryPlanNode *child) {
     num_children = SINGLE;
     left = child;
     left_pipe_id = left->out_pipe_id; // IDs of left and right input pipes corresponding to left and right children
+
+    processJoinChild(this);
+
     out_pipe_id = getNewPipeID(); // ID of output pipe
     
-    processJoinChild(this);
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1050,9 +1055,11 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     num_children = SINGLE;
     left = child;
     left_pipe_id = left->out_pipe_id; 
+
+    processJoinChild(this);
+    
     out_pipe_id = getNewPipeID(); // ID of output pipe
     
-    processJoinChild(this);
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1136,9 +1143,11 @@ DupRemovalNode::DupRemovalNode(QueryPlanNode *child) {
     num_children = SINGLE;
     left = child;
     left_pipe_id = left->out_pipe_id; // IDs of left and right input pipes corresponding to left and right children
+
+    processJoinChild(this);
+
     out_pipe_id = getNewPipeID(); // ID of output pipe
     
-    processJoinChild(this);
     Schema *left_sch = NULL;
     if (left_reader_from_join) {
         left_sch = new Schema(*(left_reader_from_join->output_schema));
@@ -1207,7 +1216,5 @@ void WriteOutNode::execute(const std::map<int, Pipe*> &pipes) {
     WriteOut *w = new WriteOut();
     w->Run(*(pipes.at(left_pipe_id)), output_file, *output_schema);
     executor = w;
-
-    //processJoinChild(this);
 
 }

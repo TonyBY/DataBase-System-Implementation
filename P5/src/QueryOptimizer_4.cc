@@ -238,7 +238,7 @@ void QueryPlan::execute() {
     int num_pipes = QueryPlanNode::next_assign_pipeID;
     for (int i = 0; i < num_pipes; i++) {
         pipes[i] = new Pipe(pipe_size);
-        std::cout << "PipeID " << i << ", Addr: " << pipes[i] << std::endl;
+        // std::cout << "PipeID " << i << ", Addr: " << pipes[i] << std::endl;
     }
     if (reset) {
         std::cout << "================== [Attention!!!] Reseting all data... ==================" << std::endl;

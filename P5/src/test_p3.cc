@@ -32,7 +32,7 @@ int clear_pipe (Pipe &in_pipe, Schema *schema, Function &func, bool print) {
 		sum += (ival + dval);
 		cnt++;
 	}
-	cout << " Sum: " << sum << endl;
+	// cout << " Sum: " << sum << endl;
 	return cnt;
 }
 int pipesz = 10000; // buffer sz allowed for each pipe

@@ -1,6 +1,5 @@
 BEGIN
 answers
 answers.tbl
-sum Double
-s_suppkey Int
+n_name String
 END

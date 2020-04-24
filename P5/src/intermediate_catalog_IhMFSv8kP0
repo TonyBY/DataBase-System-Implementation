@@ -1,16 +1,11 @@
 BEGIN
 intermediate_IhMFSv8kP0
 intermediate_IhMFSv8kP0.tbl
-s_suppkey Int
-s_name String
-s_address String
-s_nationkey Int
-s_phone String
-s_acctbal Double
-s_comment String
-ps_partkey Int
-ps_suppkey Int
-ps_availqty Int
-ps_supplycost Double
-ps_comment String
+n_nationkey Int
+n_name String
+n_regionkey Int
+n_comment String
+r_regionkey Int
+r_name String
+r_comment String
 END

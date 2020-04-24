@@ -71,7 +71,7 @@ void DBFBase::Load (Schema &f_schema, const char *loadpath) {
         cnt++;
     }
     
-    std::cout << "The number of loaded records: " << cnt << std::endl;
+    // std::cout << "The number of loaded records: " << cnt << std::endl;
 
     if (!new_page.IsEmpty()) {
         file->AddPage(&new_page, currentDataPageIdx + 1); 

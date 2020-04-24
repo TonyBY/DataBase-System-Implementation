@@ -8,7 +8,7 @@ void RunFunc::SelectFile (void* raw_args) {
 		args->outPipe->Insert(&rec);
 		cnt ++;
 	}
-	std::cout << "(To pipe " << args->outPipe << ") The number of records from file '" << args->inFile->m_metaPath << "': " << cnt << std::endl;
+	// std::cout << "(To pipe " << args->outPipe << ") The number of records from file '" << args->inFile->m_metaPath << "': " << cnt << std::endl;
 	args->outPipe->ShutDown();
 }
 
@@ -23,16 +23,6 @@ void SelectFile::Run (DBFile &inFile, Pipe &outPipe, CNF &selOp, Record &literal
 	pthread_create(&worker, NULL, (THREADFUNCPTR) RunFunc::SelectFile, (void*)args); 
 }
 
-//void SelectFile::WaitUntilDone () {
-//	std::cout << &worker << std::endl;
-//	pthread_join (worker, NULL);
-//	//std::cout << "SelectFile Done" << std::endl;
-//}
-
-//void SelectFile::Use_n_Pages (int runlen) {
-//	return;
-//}
-
 void RunFunc::SelectPipe (void* raw_args) {
 	struct args_SelectPipe* args = (struct args_SelectPipe*) raw_args;
 	Record rec;
@@ -41,35 +31,12 @@ void RunFunc::SelectPipe (void* raw_args) {
 	int pass = 0;
 	while (args->inPipe->Remove(&rec)) {
 		if (comp.Compare(&rec, args->literal, args->selOp) == 1) { // matched
-			Attribute atts[8] = {
-									{"c_custkey", Int},
-									{"c_name", String},
-									{"c_address", String},
-									{"c_nationkey", Int},
-									{"c_phone", String},
-									{"c_acctbal", Double},
-									{"c_mktsegment", String},
-									{"c_comment", String}};
-			/*
-									{"o_orderkey", Int},
-									{"o_custkey", Int},
-									{"o_orderstatus", String},
-									{"o_totalprice", Double},
-									{"o_orderdate", String},
-									{"o_orderpriority", String},
-									{"o_clerk", String},
-									{"o_shippriority", Int},
-									{"o_comment", String}
-			};
-			*/
-			//rec.Print(new Schema("", 8, atts));
-			//rec.Print(args->schema);
 			args->outPipe->Insert(&rec);
 			pass ++;
 		}
 		cnt ++;
 	}
-	std::cout << "The total number of records through pipe: " << cnt << ", " << pass << " passed and output to pipe " << args->outPipe << std::endl;
+	// std::cout << "The total number of records through pipe: " << cnt << ", " << pass << " passed and output to pipe " << args->outPipe << std::endl;
 	args->outPipe->ShutDown();
 }
 
@@ -79,17 +46,8 @@ void SelectPipe::Run (Pipe &inPipe, Pipe &outPipe, CNF &selOp, Record &literal) 
 	args->outPipe = &outPipe;
 	args->selOp = &selOp;
 	args->literal = &literal;	
-	//args->schema = &schema;
-	//pthread_t worker;
 	pthread_create(&worker, NULL, (THREADFUNCPTR) RunFunc::SelectPipe, (void*)args); 
 }
-
-//void SelectPipe::WaitUntilDone () { 
-//	//std::cout << &worker << std::endl;
-//	pthread_join (worker, NULL);
-//}
-
-//void SelectPipe::Use_n_Pages (int n) { return; }
 
 void RunFunc::Project (void* raw_args) {
 	struct args_Project* args = (struct args_Project*) raw_args;
@@ -111,17 +69,8 @@ void Project::Run (Pipe &inPipe, Pipe &outPipe, int *keepMe, int numAttsInput, i
 	pthread_create(&worker, NULL, (THREADFUNCPTR) RunFunc::Project, (void*)args); 
 }
 
-//void Project::WaitUntilDone () { 
-//	std::cout << &worker << std::endl;
-//	pthread_join (worker, NULL);
-//}
-
-//void Project::Use_n_Pages (int n) { return; }
-
 void RunFunc::Join (void* raw_args) {
-	// std::cout << "1" << std::endl;
 	struct args_Join* args = (struct args_Join*) raw_args;
-	// std::cout << "2" << std::endl;
 	int runLength = 200;
 	int buffersz = 100;
 	Record recL, recR, recMerge;
@@ -129,40 +78,11 @@ void RunFunc::Join (void* raw_args) {
 	Pipe *join_inL, *join_inR;
 	OrderMaker orderL, orderR;
 
-	//std::cout << "Joining Pipe (Addr: " << args->inPipeL << ") with Pipe (Addr: " << args->inPipeR << ")" << std::endl;
-
-	Attribute sAtt[7] = {
-							{"s_suppkey", Int}, 
-							{"s_name", String},
-					 		{"s_address", String},
-							{"s_nationkey", Int},
-							{"s_phone", String},
-							{"s_acctbal", Double},
-							{"s_comment", String}
-	};
-	
-	Attribute psAtt[5] = {
-							{"ps_partkey", Int}, 
-							{"ps_suppkey", Int},
-					 		{"ps_availqty", Int},
-							{"ps_supplycost", Double},
-							{"ps_comment", String}
-	};
-	
-	Schema s_sch ("supplier_sch", 7, sAtt);
-	Schema ps_sch ("ps_sch", 5, psAtt);
-
-	// std::cout << "3" << std::endl;
 	if (!args->selOp->GetSortOrders(orderL, orderR)) {
-		// std::cout << "4.1" << std::endl;
-		// Generating OrderMakers failed
-		//std::cout << 6666 << std::endl;
 		join_inL = args->inPipeL;
 		join_inR = args->inPipeR;
 	}
 	else {
-		// std::cout << "4.2" << std::endl;
-
 		BigQ bqL(*(args->inPipeL), bigq_outL, orderL, runLength);
 	
 		// If the two BigQ start too close, they will affect each other, then the sorting results will be wrong.
@@ -172,9 +92,7 @@ void RunFunc::Join (void* raw_args) {
 		BigQ bqR(*(args->inPipeR), bigq_outR, orderR, runLength);
 		MergeJoin(args, &bigq_outL, &bigq_outR, &orderL, &orderR);
 	}
-	// std::cout << "5" << std::endl;
 	args->outPipe->ShutDown();
-	// std::cout << "6" << std::endl;
 	//std::cout << "Done: Joining Pipe (Addr: " << args->inPipeL << ") with Pipe (Addr: " << args->inPipeR << ")" << std::endl;
 }
 
@@ -203,16 +121,9 @@ void RunFunc::MergeJoin(struct args_Join* args, Pipe* bigq_outL, Pipe* bigq_outR
 			getRight = join_inR->Remove(&recR);
 		}
 		else {
-			//recL.Print(&s_sch);
-			//recR.Print(&ps_sch);
-			//std::cout << std::endl;
-
 			vector<Record*> buff;
 			while (getLeft && (prevL == NULL || comp.Compare(prevL, &recL, orderL) == 0)) {
-				//if (prevL == NULL) {
 				prevL = new Record();
-					//prev->Consume(&recL);
-				//}
 				prevL->Consume(&recL);
 				buff.push_back(prevL);
 				getLeft = join_inL->Remove(&recL);
@@ -225,8 +136,6 @@ void RunFunc::MergeJoin(struct args_Join* args, Pipe* bigq_outL, Pipe* bigq_outR
 					recMerge.MergeRecords(buff[i], &recR, args->numAttsLeft, args->numAttsRight, args->attsToKeep, args->numAttsToKeep, args->startOfRight);
 					recR.Copy(&copyR);
 					args->outPipe->Insert(&recMerge);
-					//std::cout << "merge No." << cnt << "record, left " << buff.size() << " records, right No." << tmp_cnt << " records"<< std::endl;
-					//recR.Print(&ps_sch);
 					cnt++;
 					tmp_cnt++;
 				}
@@ -241,7 +150,7 @@ void RunFunc::MergeJoin(struct args_Join* args, Pipe* bigq_outL, Pipe* bigq_outR
 		}
 	}
 
-	std::cout << "Join (left pipe " << args->inPipeL << ", right pipe " << args->inPipeR << ", out pipe: " << args->outPipe << "): Got " << cnt-1 << " rows" << std::endl;
+	// std::cout << "Join (left pipe " << args->inPipeL << ", right pipe " << args->inPipeR << ", out pipe: " << args->outPipe << "): Got " << cnt-1 << " rows" << std::endl;
 }
 
 void Join::Run (Pipe &inPipeL, Pipe &inPipeR, Pipe &outPipe, CNF &selOp, Record &literal, 
@@ -250,9 +159,7 @@ void Join::Run (Pipe &inPipeL, Pipe &inPipeR, Pipe &outPipe, CNF &selOp, Record 
 			int *attsToKeep,
 			int numAttsToKeep,
 			int startOfRight) {
-	// std::cout << "1 " << std::endl;
 	struct RunFunc::args_Join* args = (struct RunFunc::args_Join*)malloc(sizeof(struct RunFunc::args_Join));
-	// std::cout << "2 " << std::endl;
 	args->inPipeL = &inPipeL;
 	args->inPipeR = &inPipeR;
 	args->outPipe = &outPipe;
@@ -263,9 +170,7 @@ void Join::Run (Pipe &inPipeL, Pipe &inPipeR, Pipe &outPipe, CNF &selOp, Record 
 	args->numAttsLeft = numAttsLeft;
 	args->numAttsRight = numAttsRight;
 	args->startOfRight = startOfRight;
-	// std::cout << "3 " << std::endl;
 	pthread_create(&worker, NULL, (THREADFUNCPTR) RunFunc::Join, (void*)args); 
-	// std::cout << "4 " << std::endl;
 }
 
 void RunFunc::DuplicateRemoval(void* raw_args) {
@@ -325,26 +230,24 @@ void RunFunc::Sum (void* raw_args) {
 		cnt++;
 	}
 	
-	std::cout << "Calculate sum on " << cnt << " records" << std::endl;
+	// std::cout << "Calculate sum on " << cnt << " records" << std::endl;
 	
 	Record sum;
 	Attribute sum_att = {"sum", res_type};
 	Schema sum_sch ("sum_sch", 1, &sum_att);
 	const char *sum_str;// = (char*) malloc (MAX_LEN_VAL * sizeof(char));
-	//std::cout << "HHHHHHHHHHHHHHH" << std::endl;
 	if (res_type == Int) {
 		sum_str = (Util::toString<int>(int_sum) + "|").c_str();
 		//sprintf((char*)sum_str, "%d", int_sum);
-		printf("Sum: %d\n", int_sum);
+		// printf("Sum: %d\n", int_sum);
 	}
 	else if (res_type == Double) {
 		sum_str = (Util::toString<double>(double_sum) + "|").c_str();
 		//std::cout << "Sum: " << double_sum << std::endl;
 		//sprintf((char*)sum_str, "%lf", double_sum);
-		printf("Sum: %lf\n", double_sum);
+		// printf("Sum: %lf\n", double_sum);
 		//printf("Sum: %s", sum_str);
 	}
-	//std::cout << "HHHHHHHHHHHHHHH222222" << std::endl;
 	
 	sum.ComposeRecord(&sum_sch, sum_str);
 
@@ -384,7 +287,7 @@ void RunFunc::GroupBy(void* raw_args) {
 
 	struct args_GroupBy* args = (struct args_GroupBy*) raw_args;
 
-	args->groupAtts->Print();
+	// args->groupAtts->Print();
 
 	Record cur, *prev = NULL;
 	int int_res = 0, int_sum = 0;
@@ -407,16 +310,12 @@ void RunFunc::GroupBy(void* raw_args) {
 	bool remainingRec = false;
 	int haveReadCur = 0;
 
-	std::cout << "%%%%%%%%%%%%%%%%%%%%%% GROUPBY %%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
+	// std::cout << "%%%%%%%%%%%%%%%%%%%%%% GROUPBY %%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
 
-	// std::cout << "before the while loop" << std::endl;
 	while (remainingRec || (haveReadCur = bigq_out->Remove(&cur)) || prev != NULL) {
-		// std::cout << "in the while loop" << std::endl;
 		if ((remainingRec || haveReadCur) && (prev == NULL || comp.Compare(prev, &cur, args->groupAtts) == 0)) {
-			// std::cout << "First level if" << std::endl;
 			// In the same group
 			if (prev == NULL) {
-				// std::cout << "Second level if" << std::endl;
 				prev = new Record();
 				prev->Copy(&cur);
 				remainingRec = false;
@@ -424,24 +323,20 @@ void RunFunc::GroupBy(void* raw_args) {
 			res_type = args->func->Apply(cur, int_res, double_res);
 			switch (res_type) {
 				case Int:
-					// std::cout << "Switch Int" << std::endl;
 					int_sum += int_res;
 					int_res = 0;
 					break;
 				case Double:
-					// std::cout << "Switch Double" << std::endl;
 					double_sum += double_res;
 					double_res = 0;
 					break;
 				default:
-					// std::cout << "Switch default" << std::endl;
 					std:cerr << "[Error] In RunFunc::Sum(): invalid sum result type" << std::endl;
 			}	
 		}
 		else {
-			// std::cout << "First level else" << std::endl;
 			// A new group starts
-			std::cout << "Calculate sum on " << cnt << " records" << std::endl;
+			// std::cout << "Calculate sum on " << cnt << " records" << std::endl;
 			cnt = 0;
 			Record group_sum;
 			
@@ -500,7 +395,7 @@ void RunFunc::GroupBy(void* raw_args) {
 		cnt++;
 	}
 
-	std::cout << "############################# GROUPBY %%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
+	// std::cout << "############################# GROUPBY %%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
 
 	args->outPipe->ShutDown();
 }
@@ -521,19 +416,12 @@ void RunFunc::WriteOut(void* raw_args) {
 	Schema *mySchema = args->mySchema;
 	int numAtts = mySchema->GetNumAtts();
 	Attribute* atts = mySchema->GetAtts();
-	//for (int i = 0; i < numAtts; i++) {
-	//	fprintf(args->outFile, "%s", atts[i].name);
-	//	fprintf(args->outFile, "|");
-	//}
-	//fprintf(args->outFile, "\n");
 	
 	int cnt = 0;
 	while (args->inPipe->Remove(&rec)) {
 		WriteRecord(&rec, args->outFile, args->mySchema);
 		cnt++;
 	}
-	//fprintf(args->outFile, "%s: %d\n", "The number of returned rows", cnt);
-	std::cout << "(Input from pipe " << args->inPipe << ")" << "The number of answers: " << cnt << " rows" << std::endl;
 }
 
 void RunFunc::WriteRecord(Record* rec, FILE* outFile, Schema* mySchema) {
@@ -549,7 +437,6 @@ void RunFunc::WriteRecord(Record* rec, FILE* outFile, Schema* mySchema) {
 				fprintf( outFile, "%lf", *((double*)(rec->bits + attLoc)) );
 				break;
 			case String:
-				//std::cout << "HERE" << (char*)(rec->bits + attLoc) << std::endl;
 				fprintf( outFile, "%s", (char*)(rec->bits + attLoc) );
 				break;			
 		}

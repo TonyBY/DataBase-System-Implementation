@@ -212,33 +212,6 @@ class SelectNode : public QueryPlanNode {
         void execute(const std::map<int, Pipe*> &pipes);
 };
 
-/*
-class SelectPipeNode : protected QueryPlanNode {
-    private:
-        CNF *cnf;CNF *selOp; 
-			Record *literal;
-
-    public:
-        SelectPipCNF *selOp; 
-			Record *literal;
-        SelectPipCNF *selOp; 
-			Record *literal;d, int in_pipe_id, int out_pipe_id, CNF *cnf, char *catalog_path, char *rel_name, char *alias = "");
-        ~SelectPipeNode();
-        void printSpecInfo();
-};
-
-class SelectFileNode : protected QueryPlanNode {
-    private:
-        CNF *cnf;
-
-    public:
-        SelectFileNode();
-        SelectFileNode(QueryPlanNode *child, int in_pipe_id, int out_pipe_id, CNF *cnf, char *catalog_path, char *rel_name, char *alias = "");
-        ~SelectFileNode();
-        void printSpecInfo();
-};
-*/
-
 class ProjectNode : public QueryPlanNode {
     private:
         struct Attribute *keep_atts;
