@@ -259,12 +259,20 @@ const Schema* QueryPlan::getOutSchema() {
 }
 
 void QueryPlan::createPlanTree() {
+    //Count number of selects and joins.
+    for (int i = 0;i < min_order.size(); i++) {
+        if(isJoin(min_order[i])){
+            number_of_joins++;
+        }
+        else{
+            number_of_selects++;
+        }
+    }
+    std::cout << "Number of selects: " << number_of_selects << std::endl;
+    std::cout << "Number of joins: " << number_of_joins << std::endl;
+
     createLoadDataNodes();  
-    //for (int i = 0 ; i < leaves.size(); i++) {
-    //    leaves[i]->print();
-    //}
     createPredicateNodes();
-    //printQueryPlanTree(root);
     createProjectNodes();
     createDupRemovalNodes();
     createSumNodes();
@@ -277,7 +285,7 @@ void QueryPlan::createPlanTree() {
 void QueryPlan::createLoadDataNodes() {
     // create nodes for loading data from files
 
-    Util::ParseTreeToString(min_order);
+    // Util::ParseTreeToString(min_order);
 
     std::map<std::string, int> all_need_rels;
     for (int i = 0;i < min_order.size(); i++) {
@@ -441,7 +449,7 @@ void QueryPlan::optimizePredicate() {
     } while (std::next_permutation(clauses.begin(), clauses.end()));
 
     optimal_predicate = Util::getParseTreeFromVector(min_order);
-    std::cout << "Optimal predicate (cost " << min_cost << "): " << Util::ParseTreeToString(optimal_predicate) << std::endl;
+    // std::cout << "Optimal predicate (cost " << min_cost << "): " << Util::ParseTreeToString(optimal_predicate) << std::endl;
 }
 
 bool QueryPlan::isValidPred(std::vector<AndList*> &predicates) {
@@ -515,16 +523,6 @@ double QueryPlan::estimateTotalCost(std::vector<AndList*> &whole_pred) {
 
 void QueryPlan::getRelsForStat(char* relNames[], int &numToJoin, AndList *single_pred, Statistics *tmp_stat){
     std::vector<std::string> rels = getRelNames(single_pred);
-    //char* relNames[MAX_NUM_RELS];
-    //int numToJoin = 0;
-//    if (rels.size() == 1) {
-        // predicate is selection
-//        relNames[0] = (char*)rels[0].c_str();
-//        numToJoin = 1;
-//    }
-//    else {
-        // join
-        //std::vector<std::string> all_orig_rels;
     std::vector<std::string> src_joined_rel1 = Util::splitString(tmp_stat->joined_relations[rels[0]]->name, '&'); 
         //relNames = (char**) malloc (numToJoin * sizeof(char*)); 
     for (int i = 0; i < src_joined_rel1.size(); i++) {
@@ -552,14 +550,7 @@ double QueryPlan::estimateAndApplySinglePred(AndList* single_pred, Statistics *t
     }
     int numToJoin = 0;
     getRelsForStat(relNames, numToJoin, single_pred, tmp_stat);
-    //char *relNames[] = {"supplier","partsupp"};
-    //int numToJoin = 2;
-    //printf(relNames[0]);
     double cost = tmp_stat->Estimate(single_pred, relNames, numToJoin);
-    //getRelsForStat(relNames, numToJoin, single_pred, tmp_stat);
-    ///std::cout << "ME" << std::endl;
-    //printf("\n");
-    //printf(relNames[0]);
     tmp_stat->Apply(single_pred, relNames, numToJoin);
     tmp_stat->Write(tmpFile);
 
@@ -600,14 +591,7 @@ std::vector<std::string> QueryPlan::getRelNames(AndList *single_pred){
     Operand* right_operand = single_pred->left->left->right;
         
     std::vector<std::string> relations;
-    //std::string left_att_name = Util::getSuffix(std::string(left_operand->value), '.');
     std::string left_prefix = Util::getSuffix(Util::getPrefix(std::string(left_operand->value), '_'), '.');
-    //std::string left_relname = prefix_relation[left_prefix];
-    //Schema left_sch(catalog_path, (char*)(left_relname.c_str()));
-    
-    //if (left_sch.Find((char*)(left_att_name.c_str())) == -1) {
-    //    throw std::runtime_error("[Error] In function QueryPlan::getRelNames(AndList *predicate): ")
-    //}
 
     relations.push_back(prefix_relation[left_prefix]);
     
@@ -622,9 +606,6 @@ std::vector<std::string> QueryPlan::getRelNames(AndList *single_pred){
 void QueryPlan::printPredicate() {
     Util::ParseTreeToString(optimal_predicate);
 }
-
-
-
 
 QueryPlanNode::QueryPlanNode() {
     name = "";
@@ -678,40 +659,10 @@ void QueryPlanNode::saveSchema(std::string save_to, std::string relname) {
     //std::cout << "catalog close: " << !out.is_open() << std::endl;
 }
 
-
-/*
-void QueryPlanNode::print(int arg_type, int arg_left_pipe_id, int arg_right_pipe_id, int arg_out_pipe_id, int arg_file_id) {
-    std::cout << "Operation: " << name << std::endl;
-    if (arg_left_pipe_id >= 0) {
-        std::cout << "Input pipe ID " << arg_left_pipe_id << ", ";
-        if (arg_right_pipe_id >= 0) {
-            std::cout << "Input pipe ID " << arg_right_pipe_id << ", ";
-        }
-    }
-    else if (arg_type == SELECT_FILE && arg_file_id >= 0) {
-        std::cout << "Input file ID " << arg_file_id << ", ";
-    }
-    else {
-        throw std::runtime_error("[Error] In function QueryPlanNode::print(): No associated input pipes or files in operation node " + name);
-    }
-
-    if (arg_out_pipe_id >= 0) {
-        std::cout << "Output pipe ID " << arg_out_pipe_id << std::endl;
-    }
-    else {
-        throw std::runtime_error("[Error] In function QueryPlanNode::print(): No associated output pipe in operation node " + name);
-    }
-
-    std::cout << "Output schema:" << std::endl;
-    std::cout << output_schema->toString() << std::endl;
-    printSpecInfo();
-}
-*/
 void QueryPlanNode::print() {
     std::cout << " ***********" << std::endl;
     std::cout << name << " operation" << std::endl;
     if (type == SELECT_FILE && file_id >= 0) {
-        // std::cout << "Input file " << file_id << std::endl;
         std::cout << "Input pipe " << 0 << std::endl;
     }
     else {
@@ -744,7 +695,6 @@ SelectNode::SelectNode() {}
 
 SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNode *child, bool is_intermediate, 
                         const char *catalog_filepath, const char *rel_name, const char* alias, int specific_out_pipe_id) {
-    //file_id = Undefined;
     load_all_data = false;
     db = NULL;
     type = select_where;
@@ -759,8 +709,6 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
         }
         num_children = 0;
         file_id = next_assign_fileID++;
-        //relation_name = std::string(rel_name);
-        //next_assign_fileID++;
         output_schema = new Schema((char*)(by_catalog.c_str()), (char*)relation_name.c_str());
    
     }
@@ -770,9 +718,16 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
             throw runtime_error("[Error] In function SelectNode::SelectNode: Trying to initialize a SelectPipe node without a child");
         }
         num_children = 1;
-        left_pipe_id = child->out_pipe_id;
+        // left_pipe_id = child->out_pipe_id;
         left = child;
         processJoinChild(this);
+        if (left->type == JOIN){
+            left_pipe_id = left->intermediate_out_pipe_id;
+        }
+        else{
+            left_pipe_id = left->out_pipe_id;
+        }
+
         if (left_reader_from_join) {
             output_schema = new Schema(*(left_reader_from_join->output_schema));
         }
@@ -790,17 +745,14 @@ SelectNode::SelectNode(int select_where, AndList *select_conditions, QueryPlanNo
     else {
         out_pipe_id = getNewPipeID();
     }
-    
-    //output_schema = new Schema((char*)(by_catalog.c_str()), (char*)relation_name.c_str());
    
     if (select_conditions != NULL){
-        //this->cnf = cnf;
         load_all_data = false;
         cnf = new CNF();
         literal = new Record();
         cnf->GrowFromParseTree(select_conditions, output_schema, *literal);
-        //Attribute lit_att = {"val", Int};
-        //literal->Print(new Schema("", 1, &lit_att));
+        Util::addRelNameBackToPred(select_conditions);
+        CNF_string = Util::ParseTreeToString(select_conditions); 
     }
     else {
         load_all_data = true;
@@ -823,12 +775,13 @@ SelectNode::~SelectNode() {
 }
 
 void SelectNode::printSpecInfo() {
-    std::cout << "CNF:" << std::endl;
     if (!load_all_data){
-        cnf->Print();
+        std::cout << "CNF:" << std::endl;
+        std::cout << CNF_string << std::endl;
+        // cnf->Print();
     }
     else {
-        std::cout << "No CNF because this node is only for loading all data" << std::endl;
+        // std::cout << "No CNF because this node is only for loading all data" << std::endl;
     }
 }
 
@@ -866,30 +819,6 @@ void SelectNode::execute(const std::map<int, Pipe*> &pipes) {
         //executor.WaitUntilDone();
     }
 }
-/*
-SelectFileNode::SelectFileNode() {}
-
-SelectFileNode::SelectFileNode(QueryPlanNode *child, int in_pipe_id, int out_pipe_id, 
-                                CNF *cnf, char *, char *rel_name, char* alias) {
-    name = "SelectPipe";
-    num_children = 1;
-    left = child;
-    //right = NULL;
-    left_pipe_id = in_pipe_id;
-    //right_pipe_id = -1; 
-    this->out_pipe_id = out_pipe_id; 
-    this->cnf = cnf;
-    output_schema = new Schema(catalog_path, rel_name);
-}
-
-SelectFileNode::~SelectFileNode() {
-    delete output_schema;
-}
-
-void SelectFileNode::printSpecInfo() {
-    cnf->Print();
-}
-*/
 
 ProjectNode::ProjectNode() {}
 
@@ -901,11 +830,20 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     type = PROJECT;
     num_children = SINGLE;
     left = child;
-    left_pipe_id = child->out_pipe_id;
-    out_pipe_id = getNewPipeID();
+    // left_pipe_id = child->out_pipe_id;
+    // out_pipe_id = getNewPipeID();
 
     Schema *input_schema = NULL;
     processJoinChild(this);
+
+    if (child->type == JOIN){
+        left_pipe_id = child->intermediate_out_pipe_id;
+    }
+    else{
+        left_pipe_id = child->out_pipe_id;
+    }
+    out_pipe_id = getNewPipeID();
+
     if (left_reader_from_join) {
         input_schema = new Schema(*(left_reader_from_join->output_schema));
     }
@@ -936,11 +874,7 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     //processJoinChild(this);
 
 }
-/*
-ProjectNode::ProjectNode(int *keepMe, int numAttsInput, int numAttsOutput, QueryPlanNode *child) {
 
-}
-*/      
 ProjectNode::~ProjectNode() {
     free(keep_atts);
     free(keepMe);
@@ -949,11 +883,11 @@ ProjectNode::~ProjectNode() {
 }
 
 void ProjectNode::printSpecInfo() {
-    std::cout << "Attributes to keep:" << std::endl;
-    for (int i = 0; i < numAttsOutput; i++) {
-        std::cout << keep_atts[i].name << ": " << TypeStr[keep_atts[i].myType] << "; ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Attributes to keep:" << std::endl;
+    // for (int i = 0; i < numAttsOutput; i++) {
+    //     std::cout << keep_atts[i].name << ": " << TypeStr[keep_atts[i].myType] << "; ";
+    // }
+    // std::cout << std::endl;
 }
 
 void ProjectNode::execute(const std::map<int, Pipe*> &pipes) {
@@ -995,13 +929,10 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
 
     cnf = new CNF();
     literal = new Record();
-    /*
-    cnf->GrowFromParseTree(join_statement, left->output_schema, right->output_schema, *literal); 
-	//this->literal = literal;
-	numAttsLeft = left->output_schema->GetNumAtts();
-    numAttsRight = right->output_schema->GetNumAtts();
-	*/
+
     cnf->GrowFromParseTree(join_statement, left_sch, right_sch, *literal); 
+    Util::addRelNameBackToPred(join_statement);
+    CNF_string = Util::ParseTreeToString(join_statement);
 	//this->literal = literal;
 	numAttsLeft = left_sch->GetNumAtts();
     numAttsRight = right_sch->GetNumAtts();
@@ -1026,37 +957,12 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     intermediate_rel_name = intermediate_file_prefix + std::string("_") + random_suffix;
     intermediate_file = intermediate_rel_name + std::string(tpch_ext_name);
     intermediate_catalog = intermediate_catalog_prefix + "_" + random_suffix;
-    //std::cout << "1" <<std::endl;
-    saveSchema(std::string(intermediate_catalog), intermediate_rel_name);
-    //std::cout << "2" <<std::endl;
-    writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
-    //std::cout << "Writer in join, in pipe: " << writer->left_pipe_id << std::endl;
-    //writer->print();
-    //std:cout << std::endl;
-    //reader = new SelectNode(SELECT_FILE, NULL, NULL, true, intermediate_catalog.c_str(), intermediate_rel_name.c_str());
-    //reader->print();
-    
-    //out_pipe_id = reader->out_pipe_id;
-    //processJoinChild(this);
-    //delete left_sch;
-    //delete right_sch;
 
+    saveSchema(std::string(intermediate_catalog), intermediate_rel_name);
+
+    writer = new WriteOutNode(std::string(tpch_dir) + intermediate_file, this);
 }
-/*
-void JoinNode::saveSchema(std::string save_to) {
-    std::ofstream out;
-    out.open(save_to.c_str(), std::ofstream::trunc | std::ofstream::out);
-    //std::cout << "catalog create: " << out.is_open() << std::endl;
-    std::string out_str = "BEGIN\n" + intermediate_rel_name + "\n" + intermediate_file + "\n";
-    for (int i = 0; i < output_schema->numAtts; i++) {
-        out_str += std::string(output_schema->GetAtts()[i].name) + " " + TypeStr[output_schema->GetAtts()[i].myType] + "\n";
-    }
-    out_str += "END\n";
-    out << out_str;
-    out.close();
-    //std::cout << "catalog close: " << !out.is_open() << std::endl;
-}
-*/
+
 JoinNode::~JoinNode() {
     delete cnf;
     delete literal;
@@ -1070,37 +976,22 @@ JoinNode::~JoinNode() {
 
 void JoinNode::printSpecInfo() {
     std::cout << "CNF:" << std::endl;
-    cnf->Print();
+    std::cout << "        " + CNF_string << std::endl;
+    // cnf->Print();
 }
 
 void JoinNode::execute(const std::map<int, Pipe*> &pipes) {
     Join *j = new Join();
     j->Run(*(pipes.at(left_pipe_id)), *(pipes.at(right_pipe_id)), *(pipes.at(intermediate_out_pipe_id)), *cnf, *literal,
             numAttsLeft, numAttsRight, attsToKeep, numAttsToKeep, startOfRight);
-    //executor = j;
     writer->execute(pipes);
-    //std::cout << "Good000" << std::endl;
     j->WaitUntilDone();
-    //std::cout << "Good111" << std::endl;
     writer->executor->WaitUntilDone();
-    //std::cout << "Good" << std::endl;
     
     delete j;
-    //fclose(writer->output_file);
-    //writer->output_file = NULL;
-    
-    //fclose(writer->output_file);
-    //writer->output_file = NULL;
     delete writer;
 
-    //saveSchema(intermediate_catalog);
-
-    //printFile(std::string(tpch_dir) + intermediate_file);
-    //exit(1);
-    //reader->execute(pipes);
-    //executor = reader->executor;
     executor = NULL;//writer->executor;
-    //sleep(2);
 }
 
 SumNode::SumNode() {}
@@ -1169,9 +1060,6 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     else {
         left_sch = new Schema(*(left->output_schema));
     }
-
-    // Make OrderMaker
-    //Attribute *group_atts = (Attribute*) malloc (MAX_NUM_ATTS * sizeof(Attribute));
     
     Attribute *group_atts = new Attribute[MAX_NUM_ATTS];
     int num_atts = 0;
@@ -1179,7 +1067,6 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     while (group_att_names != NULL) {
         group_atts[num_atts].name = (char*) malloc (MAX_LEN_ATTNAME * sizeof(char));
         strcpy(group_atts[num_atts].name, group_att_names->name);
-        //group_atts[num_atts].myType = left->output_schema->FindType(group_att_names->name);
         group_atts[num_atts].myType = left_sch->FindType(group_att_names->name);
         
         int idx = left_sch->Find(group_att_names->name);
@@ -1193,8 +1080,8 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
         whichAttsStr += Util::toString<int>(idx);
         whichTypesStr += TypeStr[left_sch->FindType(group_att_names->name)];
 
-        std::cout << group_att_names->name << std::endl;
-        std::cout << left_sch->FindType(group_att_names->name) << std::endl;
+        // std::cout << group_att_names->name << std::endl;
+        // std::cout << left_sch->FindType(group_att_names->name) << std::endl;
 
         num_atts++;
         group_att_names = group_att_names->next;
@@ -1217,11 +1104,6 @@ GroupByNode::GroupByNode(FuncOperator *agg_func, NameList *group_att_names, Quer
     }
 
     output_schema = new Schema("", num_atts+1, output_atts);
-
-    //delete[] group_atts;
-    //delete[] output_atts;
-
-    //delete left_sch;
 
 }
 
