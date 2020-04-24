@@ -763,7 +763,7 @@ void QueryPlanNode::print() {
         }
     }
     if (type == WRITE_OUT && file_id >= 0) {
-        std::cout << "Output file ID " << file_id << std::endl;
+        std::cout << "Output pipe ID " << next_assign_pipeID << std::endl;
     }
     else if (type == JOIN){
         std::cout << "Output pipe ID " << intermediate_out_pipe_id << std::endl;
@@ -1011,11 +1011,7 @@ ProjectNode::ProjectNode(NameList *atts, QueryPlanNode *child) {
     //processJoinChild(this);
 
 }
-/*
-ProjectNode::ProjectNode(int *keepMe, int numAttsInput, int numAttsOutput, QueryPlanNode *child) {
-
-}
-*/      
+  
 ProjectNode::~ProjectNode() {
     free(keep_atts);
     free(keepMe);
@@ -1131,21 +1127,7 @@ JoinNode::JoinNode(AndList *join_statement, QueryPlanNode *left_child, QueryPlan
     //delete right_sch;
 
 }
-/*
-void JoinNode::saveSchema(std::string save_to) {
-    std::ofstream out;
-    out.open(save_to.c_str(), std::ofstream::trunc | std::ofstream::out);
-    //std::cout << "catalog create: " << out.is_open() << std::endl;
-    std::string out_str = "BEGIN\n" + intermediate_rel_name + "\n" + intermediate_file + "\n";
-    for (int i = 0; i < output_schema->numAtts; i++) {
-        out_str += std::string(output_schema->GetAtts()[i].name) + " " + TypeStr[output_schema->GetAtts()[i].myType] + "\n";
-    }
-    out_str += "END\n";
-    out << out_str;
-    out.close();
-    //std::cout << "catalog close: " << !out.is_open() << std::endl;
-}
-*/
+
 JoinNode::~JoinNode() {
     delete cnf;
     delete literal;
