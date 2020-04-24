@@ -1,0 +1,11 @@
+BEGIN
+intermediate_zLOZ2nOXpP
+intermediate_zLOZ2nOXpP.tbl
+n_nationkey Int
+n_name String
+n_regionkey Int
+n_comment String
+r_regionkey Int
+r_name String
+r_comment String
+END
