@@ -1,0 +1,19 @@
+BEGIN
+intermediate_Q2RQ0DRJKR
+intermediate_Q2RQ0DRJKR.tbl
+n_nationkey Int
+n_name String
+n_regionkey Int
+n_comment String
+r_regionkey Int
+r_name String
+r_comment String
+c_custkey Int
+c_name String
+c_address String
+c_nationkey Int
+c_phone String
+c_acctbal Double
+c_mktsegment String
+c_comment String
+END

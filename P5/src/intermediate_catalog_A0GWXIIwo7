@@ -1,0 +1,25 @@
+BEGIN
+intermediate_A0GWXIIwo7
+intermediate_A0GWXIIwo7.tbl
+p_partkey Int
+p_name String
+p_mfgr String
+p_brand String
+p_type String
+p_size Int
+p_container String
+p_retailprice Double
+p_comment String
+s_suppkey Int
+s_name String
+s_address String
+s_nationkey Int
+s_phone String
+s_acctbal Double
+s_comment String
+ps_partkey Int
+ps_suppkey Int
+ps_availqty Int
+ps_supplycost Double
+ps_comment String
+END
