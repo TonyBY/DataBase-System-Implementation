@@ -34,7 +34,7 @@ l_suppkey
 10000
 l_tax
 9
-nation&customer&region
+nation&region&customer
 50000
 15
 c_acctbal
@@ -141,11 +141,11 @@ s_suppkey
 10000
 8
 customer
-nation&customer&region
+nation&region&customer
 lineitem
 lineitem
 nation
-nation&customer&region
+nation&region&customer
 orders
 orders
 part
@@ -153,6 +153,6 @@ part
 partsupp
 partsupp
 region
-nation&customer&region
+nation&region&customer
 supplier
 supplier

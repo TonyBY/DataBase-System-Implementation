@@ -65,6 +65,8 @@ void RDBMS::start() {
                     plan -> printAnswers();
                 }
                 else{
+                    std::cout << std::endl;
+                    std::cout << "Start processing the query..." << std::endl;
                     plan->createPlanTree();
                     plan->execute();
                     system(("cp " + temp_ans_dir + " "+ dbfile_dir + "results/" + deoutput + ".tbl").c_str());
